@@ -1,11 +1,7 @@
 const express = require('express');
+const UserController = require('./modules/user/user.controller');
 
 const router = express.Router();
+router.get('/users', UserController.get_users);
+
 module.exports = router;
-router.get('/api/users', (req, res) => {
-    console.log('Inside get user api');
-    return res.json({
-        status: true,
-        response: 'Inside get user api'
-    });
-});

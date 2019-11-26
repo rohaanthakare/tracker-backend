@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const express = require('express');
+
+// Application Imports
 const routes = require('./routes');
 
 const app = express();
@@ -9,4 +11,9 @@ const server = app.listen(port, () => {
     console.log('Connected to Port - ' + port);
 });
 
-app.use('/', routes);
+app.use('/api', routes);
+
+app.use('/', function(req, res) {
+    res.send('Invalid Endpoint');
+});
+
