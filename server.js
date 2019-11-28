@@ -9,7 +9,7 @@ const routes = require('./routes');
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
-const port = 4191;
+const port = process.env.PORT || 4191;
 const server = app.listen(port, () => {
     console.log('Connected to Port - ' + port);
 });
