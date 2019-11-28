@@ -4,5 +4,6 @@ const UserController = require('./modules/user/user.controller');
 const router = express.Router();
 // User API's
 router.post('/register_user', UserController.register_user);
+router.post('/users', UserController.get_users);
 
 module.exports = router;
