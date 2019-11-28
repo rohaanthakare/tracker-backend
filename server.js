@@ -15,14 +15,14 @@ const server = app.listen(port, () => {
 });
 
 // Connect to Database
-// mongoose.connect(config.database);
-// mongoose.connection.on('connected', () => {
-//     console.log('Connected to Database - ' + config.database);
-// });
+mongoose.connect(config.database);
+mongoose.connection.on('connected', () => {
+    console.log('Connected to Database - ' + config.database);
+});
 
-// mongoose.connection.on('error', () => {
-//     console.log('Error while connecting to Database - ' + config.database);
-// });
+mongoose.connection.on('error', () => {
+    console.log('Error while connecting to Database - ' + config.database);
+});
 
 app.use('/api', routes);
 
