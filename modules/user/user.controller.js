@@ -9,6 +9,13 @@ async function get_users(req, res) {
 }
 
 async function register_user(req, res) {
-    let user = await UserService.save_user(req.body);
-    res.send('Inside User Controller - register_user');
+    // let user = await UserService.save_user(req.body);
+    // if(user) {
+        res.send({
+            status: true,
+            message: 'User registered successfully'
+        });
+    // } else {
+
+    // }
 }
