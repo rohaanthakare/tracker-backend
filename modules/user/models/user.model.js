@@ -9,11 +9,11 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    email: {
+    emailId: {
         type: String,
         required: true
     },
-    mobile_no: {
+    mobileNo: {
         type: Number,
         required: true
     },
