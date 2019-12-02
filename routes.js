@@ -13,6 +13,7 @@ router.post('/create_master_view', MasterViewController.create_view_config);
 
 // Role API's 
 router.post('/create_role', RoleController.create_role);
+router.post('/assign_permission', RoleController.assign_permission);
 
 // User API's
 router.post('/register_user', UserController.register_user);

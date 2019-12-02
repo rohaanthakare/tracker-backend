@@ -13,17 +13,23 @@ async function get_view_by(params) {
 }
 
 async function create_view(params) {
-    if(params.parentView === '') {
-        delete params.parentView;
-    } else {
-        let search_query = {
-            search_key: 'viewCode',
-            search_value: params.parentView 
-        };
-        let parentViewConfig = await get_view_by(search_query);
-        params.parentView = parentViewConfig[0]._id;
+    let view_config = await MasterView.findOne({
+        viewCode: params.viewCode
+    });
+    if (!view_config) {
+        if(params.parentView === '') {
+            delete params.parentView;
+        } else {
+            let search_query = {
+                search_key: 'viewCode',
+                search_value: params.parentView 
+            };
+            let parentViewConfig = await get_view_by(search_query);
+            params.parentView = parentViewConfig[0]._id;
+        }
+    
+        view_config = await new MasterView(params).save();
     }
-
-    let view_config = await new MasterView(params).save();
+    
     return view_config;
 }

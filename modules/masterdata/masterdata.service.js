@@ -12,16 +12,22 @@ async function get_master_data_by(params) {
 }
 
 async function create_master_data(params) {
-    if(params.parentConfig === '') {
-        delete params.parentConfig;
-    } else {
-        let search_query = {
-            search_key: 'configCode',
-            search_value: params.parentConfig 
-        };
-        let parentMasterData = await get_master_data_by(search_query);
-        params.parentConfig = parentMasterData[0]._id;
+    let master_data = await MasterData.findOne({
+        configCode: params.configCode
+    });
+
+    if(!master_data) {
+        if(params.parentConfig === '') {
+            delete params.parentConfig;
+        } else {
+            let search_query = {
+                search_key: 'configCode',
+                search_value: params.parentConfig 
+            };
+            let parentMasterData = await get_master_data_by(search_query);
+            params.parentConfig = parentMasterData[0]._id;
+        }
+        let master_data = await new MasterData(params).save();
     }
-    let master_data = await new MasterData(params).save();
     return master_data;
 } 
