@@ -18,7 +18,7 @@ async function create_view(params) {
     } else {
         let search_query = {
             search_key: 'viewCode',
-            search_value: params.parentConfig 
+            search_value: params.parentView 
         };
         let parentViewConfig = await get_view_by(search_query);
         params.parentView = parentViewConfig[0]._id;
