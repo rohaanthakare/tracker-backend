@@ -18,6 +18,7 @@ router.post('/assign_permission', RoleController.assign_permission);
 // User API's
 router.post('/register_user', UserController.register_user);
 router.get('/users', UserController.get_users);
+router.post('/attach_role', UserController.attach_role);
 router.get('/get_user', function (req, res){
     res.send('Hurryyy Inside get_user route of backend server');
 });

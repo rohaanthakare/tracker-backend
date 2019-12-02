@@ -26,7 +26,11 @@ const UserSchema = new mongoose.Schema({
     },
     userStatus: {
         type: mongoose.Schema.Types.ObjectId
-    } 
+    },
+    role:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Role'
+    }
 }, {
     versionKey: false,
     timestamps: {

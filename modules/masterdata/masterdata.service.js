@@ -15,8 +15,7 @@ async function create_master_data(params) {
     let master_data = await MasterData.findOne({
         configCode: params.configCode
     });
-
-    if(!master_data) {
+    if(!master_data || master_data === null) {
         if(params.parentConfig === '') {
             delete params.parentConfig;
         } else {
@@ -27,7 +26,7 @@ async function create_master_data(params) {
             let parentMasterData = await get_master_data_by(search_query);
             params.parentConfig = parentMasterData[0]._id;
         }
-        let master_data = await new MasterData(params).save();
+        master_data = await new MasterData(params).save();
     }
     return master_data;
 } 
