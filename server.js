@@ -15,6 +15,7 @@ const server = app.listen(port, () => {
 });
 
 // Connect to Database
+mongoose.set('debug', true);
 mongoose.connect(config.database);
 mongoose.connection.on('connected', () => {
     console.log('Connected to Database - ' + config.database);

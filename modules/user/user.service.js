@@ -1,5 +1,9 @@
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const _ = require('lodash');
+const config = require('../../configs/global.config');
 const User = require('./models/user.model');
+const Role = require('../role/models/role.model');
 
 module.exports = {
     save_user,
@@ -62,10 +66,18 @@ async function authenticate(params) {
         };
     } else {
         if (bcrypt.compareSync(params.password, user[0].password)) {
+            let user_info = await User.findById(user[0]._id).populate({path: 'role'});
+            let user_data = _.pick(user_info,['username', 'emailId', 'mobileNo', 'role.roleCode']);
+            user_data.role = user_data.role.roleCode;
+            const user_token = jwt.sign(user_data, config.token_secret, {
+                algorithm : "HS256",
+                expiresIn : 60*60*12
+            });
             return {
                 status: true,
                 message: 'User authenticated successfully',
-                user
+                user: user_data,
+                user_token
             };  
         } else {
             return {
