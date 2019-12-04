@@ -4,11 +4,17 @@ const RoleService = require('../role/role.service');
 module.exports = {
     get_users,
     register_user,
-    attach_role
+    attach_role,
+    authenticate
 }
 
 async function get_users(req, res) {
     res.send('Inside User Controller - get_Users');
+}
+
+async function authenticate(req, res) {
+    let user = await UserService.authenticate(req.body);
+    res.send(user);
 }
 
 async function register_user(req, res) {    

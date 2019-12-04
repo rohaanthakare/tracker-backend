@@ -5,7 +5,8 @@ module.exports = {
     save_user,
     check_availability,
     get_user_by,
-    attach_role
+    attach_role,
+    authenticate
 }
 
 async function save_user(params) {
@@ -46,4 +47,31 @@ async function attach_role(params) {
         }, user);
     }
     return user;
+}
+
+async function authenticate(params) {
+    let search_query = {
+        search_key: 'username',
+        search_value: params.username 
+    };
+    let user = await get_user_by(search_query);
+    if(user.length === 0) {
+        return {
+            status: false,
+            message: 'User does not exist, please register'
+        };
+    } else {
+        if (bcrypt.compareSync(params.password, user[0].password)) {
+            return {
+                status: true,
+                message: 'User authenticated successfully',
+                user
+            };  
+        } else {
+            return {
+                status: false,
+                message: 'Invalid Username or Password, please try again'
+            };    
+        }
+    }
 }
