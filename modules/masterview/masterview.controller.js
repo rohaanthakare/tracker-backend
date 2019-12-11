@@ -1,7 +1,8 @@
 const MasterViewService = require('./masterview.service');
 
 module.exports = {
-    create_view_config
+    create_view_config,
+    getNavigationMenu
 }
 
 async function create_view_config(req, res) {
@@ -12,4 +13,12 @@ async function create_view_config(req, res) {
             master_view
         });
     }
+}
+
+async function getNavigationMenu(req, res) {
+    let menus = await MasterViewService.getNavigationMenu(req.current_user);
+    res.send({
+        status: true,
+        menus
+    });
 }

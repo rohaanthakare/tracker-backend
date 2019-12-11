@@ -10,6 +10,8 @@ router.post('/create_master_data', MasterDataController.create_master_data);
 
 // Master View API's 
 router.post('/create_master_view', MasterViewController.create_view_config);
+router.get('/get_navigation_menu', MasterViewController.getNavigationMenu);
+
 
 // Role API's 
 router.post('/create_role', RoleController.create_role);
@@ -22,3 +24,4 @@ router.post('/attach_role', UserController.attach_role);
 router.post('/authenticate_user', UserController.authenticate);
 
 module.exports = router;
+module.exports.ROUTES_WIHTOUT_AUTH = ['/api/authenticate_user'];
