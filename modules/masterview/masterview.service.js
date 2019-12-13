@@ -44,38 +44,28 @@ async function create_view(params) {
 }
 
 async function getNavigationMenu(current_user) {
-    console.log('------Inside getNavigationMenu');
-    console.log(current_user);
     let role = await Role.findOne({
         roleCode: current_user.role
-    }).populate({
-        path: 'permission'
-    });
+    }).populate('permission');
 
+    let userPermissions = [];
+    userPermissions = Array.from(role.permission);
     let finalRes = [];
-    for(let index = 0; index < role.permission.length; index++) {
-        let currentMenu = role.permission[index];
-        console.log('-------CurrentMenu-------');
-        console.log(currentMenu);
-        console.log('-------Final Result-------');
-        console.log(finalRes);
-        if(!currentMenu.parentView) {
-            finalRes.push(currentMenu);
+    for(let index = 0; index < userPermissions.length; index++) {
+        let currentView = userPermissions[index].toJSON();
+        if(!currentView.parentView) {
+            finalRes.push(currentView);
         } else {
-            for(let j = 0; j < finalRes.length; j++) {
-                let currentParent = finalRes[j];
-                if (currentParent._id === currentMenu.parentView) {
-                    console.log('----Match Found');
-
-                }        
-            }
-            // let parentEle = finalRes.find(res => res._id === currentMenu.parentView);
-            // if(parentEle.items) {
-            //     parentEle.items.push(currentMenu);
-            // } else {
-            //     parentEle.items = [];
-            //     parentEle.items.push(currentMenu);
-            // }
+            finalRes.forEach((res) => {
+                if(res._id.equals(currentView.parentView)) {
+                    if (res.items) {
+                        res.items.push(currentView);
+                    } else {
+                        res.items = [];
+                        res.items.push(currentView);
+                    }
+                }
+            });
         }
     }
     return finalRes;
