@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const cors = require('cors');
 
 // Application Imports
 const config = require('./configs/global.config');
@@ -9,6 +10,7 @@ const routes = require('./routes');
 const ROUTES_WIHTOUT_AUTH = require('./routes').ROUTES_WIHTOUT_AUTH;
 
 const app = express();
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 const port = process.env.PORT || 4191;
