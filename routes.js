@@ -11,6 +11,7 @@ router.post('/create_master_data', MasterDataController.create_master_data);
 // Master View API's 
 router.post('/create_master_view', MasterViewController.create_view_config);
 router.get('/get_navigation_menu', MasterViewController.getNavigationMenu);
+router.get('/get_toolbar_actions/:parentView', MasterViewController.getToolbarActions);
 
 
 // Role API's 

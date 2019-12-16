@@ -2,7 +2,8 @@ const MasterViewService = require('./masterview.service');
 
 module.exports = {
     create_view_config,
-    getNavigationMenu
+    getNavigationMenu,
+    getToolbarActions
 }
 
 async function create_view_config(req, res) {
@@ -21,4 +22,20 @@ async function getNavigationMenu(req, res) {
         status: true,
         menus
     });
+}
+
+async function getToolbarActions(req, res) {
+    let actions = await MasterViewService.getToolbarActions(req.params);
+    if (actions) {
+        res.send({
+            status: true,
+            actions
+        });
+    } else {
+        res.send({
+            status: false,
+            message: 'Error while fetching toolbar actions'
+        });
+    }
+    
 }
