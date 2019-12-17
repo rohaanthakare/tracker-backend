@@ -1,7 +1,8 @@
 const Password = require('./models/password.model');
 
 module.exports = {
-    getPasswords
+    getPasswords,
+    createPassword
 }
 
 async function getPasswords(params, current_user) {
@@ -20,4 +21,10 @@ async function getPasswords(params, current_user) {
         count: recCount,
         data: passwords
     };
+}
+
+async function createPassword(params, current_user) {
+    params.user_id = current_user._id;
+    let password = Password.createPassword(params);
+    return password;
 }

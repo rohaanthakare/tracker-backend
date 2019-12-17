@@ -23,5 +23,10 @@ const PasswordSchema = new mongoose.Schema({
     }
 });
 
+PasswordSchema.statics.createPassword = function(params) {
+    let password = new Password(params).save();
+    return password;
+}
+
 const Password = mongoose.model('Password', PasswordSchema);
 module.exports = Password;

@@ -30,8 +30,6 @@ mongoose.connection.on('error', () => {
 });
 
 app.use(function (req, res, next) {
-    console.log('-----Req header-------');
-    console.log(ROUTES_WIHTOUT_AUTH);
     if(ROUTES_WIHTOUT_AUTH.includes(req.originalUrl)) {
         console.log('----Auth not required----');
         next();
