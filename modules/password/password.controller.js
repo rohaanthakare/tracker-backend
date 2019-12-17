@@ -2,11 +2,12 @@ const PasswordService = require('./password.service');
 
 module.exports = {
     getPasswords,
-    createPassword
+    createPassword,
+    getPasswordDetail
 };
 
 async function getPasswords(req, res) {
-    let response = await PasswordService.getPasswords(req.params, req.current_user);
+    let response = await PasswordService.getPasswords(req.query, req.current_user);
     res.send(response);
 }
 
@@ -15,7 +16,7 @@ async function createPassword(req, res) {
     if (password) {
         res.send({
             status: true,
-            password,
+            model: password,
             message: 'Password created successfully'
         });
     } else {
@@ -24,4 +25,12 @@ async function createPassword(req, res) {
             message: 'Error while creating password, please try again'
         });
     }
+}
+
+async function getPasswordDetail(req, res) {
+    let password = await PasswordService.getPasswordDetail(req.params.id);
+    res.send({
+        status: true,
+        password
+    });
 }

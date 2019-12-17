@@ -27,6 +27,7 @@ router.post('/authenticate_user', UserController.authenticate);
 // Password Module API's
 router.get('/get_passwords', PasswordController.getPasswords);
 router.post('/create_password', PasswordController.createPassword);
+router.get('/get_password/:id', PasswordController.getPasswordDetail);
 
 module.exports = router;
 module.exports.ROUTES_WIHTOUT_AUTH = ['/api/authenticate_user'];
