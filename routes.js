@@ -30,4 +30,4 @@ router.post('/create_password', PasswordController.createPassword);
 router.get('/get_password/:id', PasswordController.getPasswordDetail);
 
 module.exports = router;
-module.exports.ROUTES_WIHTOUT_AUTH = ['/api/authenticate_user'];
+module.exports.ROUTES_WIHTOUT_AUTH = ['/api/authenticate_user', '/api/register_user'];

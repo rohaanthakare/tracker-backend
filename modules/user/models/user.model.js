@@ -24,10 +24,11 @@ const UserSchema = new mongoose.Schema({
     gender:{
         type: mongoose.Schema.Types.ObjectId
     },
-    userStatus: {
-        type: mongoose.Schema.Types.ObjectId
+    user_status: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'MasterData'
     },
-    role:{
+    role_id:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Role'
     }
