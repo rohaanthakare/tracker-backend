@@ -5,6 +5,7 @@ const config = require('../../configs/global.config');
 const User = require('./models/user.model');
 const RoleDao = require('../role/role.dao');
 const MasterDataDao = require('../masterdata/masterdata.dao');
+const TrackerMailer = require('../global/trackermailer.service');
 
 module.exports = {
     save_user,
@@ -25,6 +26,7 @@ async function save_user(params) {
         params.user_status = user_status._id;
         params.password = bcrypt.hashSync(params.password, 10);
         user = await new User(params).save();
+        await TrackerMailer.sendActivationMail(user);
     }
     return user;
 }
