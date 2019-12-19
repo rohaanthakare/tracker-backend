@@ -70,8 +70,7 @@ async function attach_role(req, res) {
     }
 }
 
-async function activateUser(req, res) {
-   
+async function activateUser(req, res) {   
     let user = await UserService.activateUser(req.body.id);
     if (user) {
         res.send({

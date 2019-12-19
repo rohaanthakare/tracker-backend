@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
+const HelperService = require('../global/helper.service');
 const config = require('../../configs/global.config');
 const User = require('./models/user.model');
 const RoleDao = require('../role/role.dao');
@@ -105,6 +106,7 @@ async function authenticate(params) {
 
 async function activateUser(user_id) {
     let userStatusActive = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', 'ACTIVE');
+    user_id = HelperService.getMongoObjectId(user_id);
     let user = await User.findByIdAndUpdate(user_id, {
         user_status: userStatusActive._id
     }, {
