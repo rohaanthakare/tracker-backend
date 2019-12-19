@@ -5,7 +5,8 @@ module.exports = {
     get_users,
     register_user,
     attach_role,
-    authenticate
+    authenticate,
+    activateUser
 }
 
 async function get_users(req, res) {
@@ -65,6 +66,23 @@ async function attach_role(req, res) {
         res.send({
             status: false,
             message: 'No User found by Username - ' + req.body.username
+        });
+    }
+}
+
+async function activateUser(req, res) {
+   
+    let user = await UserService.activateUser(req.body.id);
+    if (user) {
+        res.send({
+            status: true,
+            message: 'User activated successfully',
+            user
+        });
+    } else {
+        res.status(500).send({
+            status: false,
+            message: 'Error while activating User, please try again'
         });
     }
 }

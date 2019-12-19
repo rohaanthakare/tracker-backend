@@ -12,7 +12,8 @@ module.exports = {
     check_availability,
     get_user_by,
     attach_role,
-    authenticate
+    authenticate,
+    activateUser
 }
 
 async function save_user(params) {
@@ -100,4 +101,15 @@ async function authenticate(params) {
             };    
         }
     }
+}
+
+async function activateUser(user_id) {
+    let userStatusActive = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', 'ACTIVE');
+    let user = await User.findByIdAndUpdate(user_id, {
+        user_status: userStatusActive._id
+    }, {
+        new: true,
+        upsert: true
+    });
+    return user;
 }
