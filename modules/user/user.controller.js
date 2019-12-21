@@ -1,5 +1,8 @@
 const UserService = require('./user.service');
 const RoleService = require('../role/role.service');
+const TrackerMailer = require('../global/trackermailer.service');
+const User = require('./models/user.model');
+const bcrypt = require('bcryptjs');
 
 module.exports = {
     get_users,
@@ -7,7 +10,9 @@ module.exports = {
     attach_role,
     authenticate,
     activateUser,
-    checkAvailability
+    checkAvailability,
+    sendResetPasswordLink,
+    resetPassword
 }
 
 async function get_users(req, res) {
@@ -99,5 +104,43 @@ async function checkAvailability(req, res) {
             status: false,
             message: req.body.search_field + ' is not available' 
         });
+    }
+}
+
+async function sendResetPasswordLink(req, res) {
+    let searchQry = {
+        search_key: 'emailId',
+        search_value: req.body.emailId
+    };
+
+    let user = await UserService.get_user_by(searchQry);
+    if (user.length > 0) {
+        TrackerMailer.sendResetPassLinkMail(user[0]);
+    } else {
+        res.status(500).send({
+            status: false,
+            message: 'Email entered does not exist on tracker'
+        });
+    }
+}
+
+async function resetPassword(req, res) {
+    let user = await User.findById(req.body.userId);
+    if (user) {
+        user.password = bcrypt.hashSync(req.body.password, 10);
+        let newUser = await User.updateOne({
+            _id: user._id
+        }, user);
+        if (newUser) {
+            res.send({
+                status: true,
+                message: 'Password reset successfull, please login.'
+            });
+        }
+    } else {
+        res.status(500).send({
+            status: false,
+            message: 'Internal server error, please try again'
+        })
     }
 }

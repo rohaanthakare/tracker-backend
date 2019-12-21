@@ -25,6 +25,8 @@ router.post('/attach_role', UserController.attach_role);
 router.post('/authenticate_user', UserController.authenticate);
 router.post('/activate_user', UserController.activateUser);
 router.get('/check_availability', UserController.checkAvailability);
+router.post('/send_reset_pass_link', UserController.sendResetPasswordLink);
+router.put('/reset_password', UserController.resetPassword);
 
 // Password Module API's
 router.get('/get_passwords', PasswordController.getPasswords);
@@ -32,4 +34,4 @@ router.post('/create_password', PasswordController.createPassword);
 router.get('/get_password/:id', PasswordController.getPasswordDetail);
 
 module.exports = router;
-module.exports.ROUTES_WIHTOUT_AUTH = ['/api/authenticate_user', '/api/register_user', '/api/activate_user'];
+module.exports.ROUTES_WIHTOUT_AUTH = ['/api/authenticate_user', '/api/register_user', '/api/activate_user', '/api/reset_password'];

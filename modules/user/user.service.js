@@ -14,7 +14,8 @@ module.exports = {
     get_user_by,
     attach_role,
     authenticate,
-    activateUser
+    activateUser,
+    updateUser
 }
 
 async function saveUser(params) {
@@ -147,5 +148,15 @@ async function activateUser(user_id) {
         new: true,
         upsert: true
     });
+    return user;
+}
+
+async function updateUser(params, current_user) {
+    let user_id = params.id;
+    let user = await User.findByIdAndUpdate(user_id, params, {
+        upsert: true,
+        new: true
+    });
+
     return user;
 }
