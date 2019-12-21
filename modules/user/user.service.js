@@ -9,31 +9,65 @@ const MasterDataDao = require('../masterdata/masterdata.dao');
 const TrackerMailer = require('../global/trackermailer.service');
 
 module.exports = {
-    save_user,
-    check_availability,
+    saveUser,
+    checkAvailability,
     get_user_by,
     attach_role,
     authenticate,
     activateUser
 }
 
-async function save_user(params) {
-    let user = await User.findOne({
-        username: params.username
-    });
-    if (!user) {
-        let role = await RoleDao.getRoleByRoleCode(params.role);
-        params.role_id = role[0]._id;
-        let user_status = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', params.userStatus);
-        params.user_status = user_status._id;
-        params.password = bcrypt.hashSync(params.password, 10);
-        user = await new User(params).save();
-        await TrackerMailer.sendActivationMail(user);
+async function saveUser(params) {
+    let searchQry = {
+        search_key: 'username',
+        search_value: params.username
+    };
+    let user = await get_user_by(searchQry);
+    if (user.length > 0) {
+        return {
+            status: false,
+            message: 'Username already exist please enter other username'
+        }
     }
-    return user;
+
+    searchQry = {
+        search_key: 'emailId',
+        search_value: params.emailId
+    };
+    user = await get_user_by(searchQry);
+    if (user.length > 0) {
+        return {
+            status: false,
+            message: 'Email-Id already registered on tracker.'
+        }
+    }
+
+    searchQry = {
+        search_key: 'mobileNo',
+        search_value: params.mobileNo
+    };
+    user = await get_user_by(searchQry);
+    if (user.length > 0) {
+        return {
+            status: false,
+            message: 'Mobile number is regitered on tracker.'
+        }
+    }
+
+    let role = await RoleDao.getRoleByRoleCode(params.role);
+    params.role = role[0]._id;
+    let user_status = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', params.userStatus);
+    params.user_status = user_status._id;
+    params.password = bcrypt.hashSync(params.password, 10);
+    user = await new User(params).save();
+    await TrackerMailer.sendActivationMail(user);
+    return {
+        status: true,
+        user
+    };
 }
 
-async function check_availability(params) {
+async function checkAvailability(params) {
     let search_query = {};
     search_query[params.search_field] = params.search_value;
 

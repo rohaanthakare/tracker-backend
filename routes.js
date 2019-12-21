@@ -19,11 +19,12 @@ router.post('/create_role', RoleController.create_role);
 router.post('/assign_permission', RoleController.assign_permission);
 
 // User API's
-router.post('/register_user', UserController.register_user);
+router.post('/register_user', UserController.registerUser);
 router.get('/users', UserController.get_users);
 router.post('/attach_role', UserController.attach_role);
 router.post('/authenticate_user', UserController.authenticate);
 router.post('/activate_user', UserController.activateUser);
+router.get('/check_availability', UserController.checkAvailability);
 
 // Password Module API's
 router.get('/get_passwords', PasswordController.getPasswords);

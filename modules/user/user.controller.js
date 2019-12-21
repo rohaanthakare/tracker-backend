@@ -3,10 +3,11 @@ const RoleService = require('../role/role.service');
 
 module.exports = {
     get_users,
-    register_user,
+    registerUser,
     attach_role,
     authenticate,
-    activateUser
+    activateUser,
+    checkAvailability
 }
 
 async function get_users(req, res) {
@@ -18,17 +19,17 @@ async function authenticate(req, res) {
     res.send(user);
 }
 
-async function register_user(req, res) {    
-    let user = await UserService.save_user(req.body);
-    if(user) {
+async function registerUser(req, res) {    
+    let response = await UserService.saveUser(req.body);
+    if(response.status) {
         res.send({
             status: true,
             message: 'User registered successfully'
         });
     } else {
-        res.send({
+        res.status(500).send({
             status: false,
-            message: 'Error while creating user, please try again'
+            message: response.message
         });
     }
 }
@@ -82,6 +83,21 @@ async function activateUser(req, res) {
         res.status(500).send({
             status: false,
             message: 'Error while activating User, please try again'
+        });
+    }
+}
+
+async function checkAvailability(req, res) {
+    let isAvailable = await UserService.checkAvailability(req.body);
+    if (isAvailable) {
+        res.send({
+            status: true,
+            message: req.body.search_field + ' is available' 
+        });
+    } else {
+        res.send({
+            status: false,
+            message: req.body.search_field + ' is not available' 
         });
     }
 }

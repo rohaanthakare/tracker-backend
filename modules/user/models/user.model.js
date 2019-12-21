@@ -28,7 +28,7 @@ const UserSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'MasterData'
     },
-    role_id:{
+    role:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Role'
     }
