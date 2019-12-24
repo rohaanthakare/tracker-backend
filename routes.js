@@ -4,6 +4,7 @@ const MasterViewController = require('./modules/masterview/masterview.controller
 const RoleController = require('./modules/role/role.controller');
 const UserController = require('./modules/user/user.controller');
 const PasswordController = require('./modules/password/password.controller');
+const ContactController = require('./modules/contact/contact.controller');
 
 const router = express.Router();
 // Master data API's
@@ -32,6 +33,9 @@ router.put('/reset_password', UserController.resetPassword);
 router.get('/get_passwords', PasswordController.getPasswords);
 router.post('/create_password', PasswordController.createPassword);
 router.get('/get_password/:id', PasswordController.getPasswordDetail);
+
+// Contacts Module API's
+router.get('/get_user_contacts', ContactController.getUserContacts);
 
 module.exports = router;
 module.exports.ROUTES_WIHTOUT_AUTH = ['/api/authenticate_user', '/api/register_user', '/api/activate_user', '/api/reset_password'];
