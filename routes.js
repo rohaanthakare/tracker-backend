@@ -9,6 +9,7 @@ const ContactController = require('./modules/contact/contact.controller');
 const router = express.Router();
 // Master data API's
 router.post('/create_master_data', MasterDataController.create_master_data);
+router.get('/get_data_for_parent', MasterDataController.getDataByParentConfig);
 
 // Master View API's 
 router.post('/create_master_view', MasterViewController.create_view_config);
@@ -36,6 +37,7 @@ router.get('/get_password/:id', PasswordController.getPasswordDetail);
 
 // Contacts Module API's
 router.get('/get_user_contacts', ContactController.getUserContacts);
+router.post('/create_contact', ContactController.createContact);
 
 module.exports = router;
 module.exports.ROUTES_WIHTOUT_AUTH = ['/api/authenticate_user', '/api/register_user', '/api/activate_user', '/api/reset_password'];
