@@ -20,8 +20,14 @@ async function get_users(req, res) {
 }
 
 async function authenticate(req, res) {
-    let user = await UserService.authenticate(req.body);
-    res.send(user);
+    try {
+        let user = await UserService.authenticate(req.body);
+        res.send(user);
+    } catch (err) {
+        res.status(500).send({
+            message: 'Internal server error, please try again'
+        });
+    }
 }
 
 async function registerUser(req, res) {    

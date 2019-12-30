@@ -98,44 +98,48 @@ async function attach_role(params) {
 }
 
 async function authenticate(params) {
-    let search_query = {
-        search_key: 'username',
-        search_value: params.username 
-    };
-    let user = await get_user_by(search_query);
-    let userStatusInvited = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', 'INVITED');
-    if(user.length === 0 || user[0].user_status.equals(userStatusInvited._id)) {
-        return {
-            status: false,
-            message: 'User does not exist, please register'
+    try {
+        let search_query = {
+            search_key: 'username',
+            search_value: params.username 
         };
-    } else {
-        let userStatusNew = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', 'NEW');
-        if (user[0].user_status.equals(userStatusNew._id)) {
+        let user = await get_user_by(search_query);
+        let userStatusInvited = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', 'INVITED');
+        if(user.length === 0 || user[0].user_status.equals(userStatusInvited._id)) {
             return {
                 status: false,
-                message: 'Your account is not yet activated, please verify your account'
+                message: 'User does not exist, please register'
             };
-        } else if (bcrypt.compareSync(params.password, user[0].password)) {
-            let user_info = await User.findById(user[0]._id).populate({path: 'role'});
-            let user_data = _.pick(user_info,['_id','username', 'emailId', 'mobileNo', 'role.roleCode']);
-            user_data.role = user_data.role.roleCode;
-            const user_token = jwt.sign(user_data, config.token_secret, {
-                algorithm : "HS256",
-                expiresIn : 60*60*12
-            });
-            return {
-                status: true,
-                message: 'User authenticated successfully',
-                user: user_data,
-                user_token
-            };  
         } else {
-            return {
-                status: false,
-                message: 'Invalid Username or Password, please try again'
-            };    
+            let userStatusNew = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', 'NEW');
+            if (user[0].user_status.equals(userStatusNew._id)) {
+                return {
+                    status: false,
+                    message: 'Your account is not yet activated, please verify your account'
+                };
+            } else if (bcrypt.compareSync(params.password, user[0].password)) {
+                let user_info = await User.findById(user[0]._id).populate({path: 'role'});
+                let user_data = _.pick(user_info,['_id','username', 'emailId', 'mobileNo', 'role.roleCode']);
+                user_data.role = user_data.role.roleCode;
+                const user_token = jwt.sign(user_data, config.token_secret, {
+                    algorithm : "HS256",
+                    expiresIn : 60*60*12
+                });
+                return {
+                    status: true,
+                    message: 'User authenticated successfully',
+                    user: user_data,
+                    user_token
+                };  
+            } else {
+                return {
+                    status: false,
+                    message: 'Invalid Username or Password, please try again'
+                };    
+            }
         }
+    } catch (err) {
+        throw err;
     }
 }
 
