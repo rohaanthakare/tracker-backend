@@ -37,6 +37,7 @@ router.get('/get_password/:id', PasswordController.getPasswordDetail);
 
 // Contacts Module API's
 router.get('/get_user_contacts', ContactController.getUserContacts);
+router.get('/get_contact_detail/:id', ContactController.getContactDetails);
 router.post('/create_contact', ContactController.createContact);
 
 module.exports = router;

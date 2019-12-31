@@ -10,13 +10,21 @@ module.exports = {
 }
 
 async function createContact(req, res) {
-    req.body.user_id = req.current_user._id;
-    req.body.title = HelperService.getMongoObjectId(req.body.title._id);
-    let contact = await ContactService.createContact(req.body, req.current_user);
-    res.send({
-        status: true,
-        contact
-    });
+    try {
+        req.body.user_id = req.current_user._id;
+        req.body.title = HelperService.getMongoObjectId(req.body.title._id);
+        let contact = await ContactService.createContact(req.body, req.current_user);
+        res.send({
+            status: true,
+            model: contact,
+            message: 'Contact created successfully'
+        });
+    } catch (err) {
+        res.status(500).send({
+            status: false,
+            message: 'Internal server error, please try again'
+        });
+    }
 }
 
 async function getUserContacts(req, res) {
@@ -32,9 +40,10 @@ async function updateContact(req, res) {
 }
 
 async function getContactDetails(req, res) {
+    let contact = await ContactService.getContactDetails(req.params.id);
     res.send({
         status: true,
-        message: 'Inside getContactDetails method'
+        contact
     });
 }
 
