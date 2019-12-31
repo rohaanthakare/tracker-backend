@@ -10,7 +10,9 @@ module.exports = {
 }
 
 async function getContactDetails(id) {
-    let contact = await Contact.findById(id);
+    let contact = await Contact.findById(id).populate({
+        path: 'title'
+    });
     return contact;
 }
 
