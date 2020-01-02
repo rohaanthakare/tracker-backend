@@ -12,7 +12,8 @@ let transporter = nodemailer.createTransport({
 module.exports = {
     sendTrackerMail,
     sendActivationMail,
-    sendResetPassLinkMail
+    sendResetPassLinkMail,
+    sendTrackerInviteMail
 }
 
 async function sendTrackerMail() {
@@ -55,6 +56,24 @@ async function sendResetPassLinkMail(userInfo) {
         subject: 'Tracker - Reset password',
         html: '<p>Hi ' +userInfo.username + ',</p><p>Please click below link to reset your tracker password<p>'
             + '<a href="http://localhost:4200/#/reset-pass/' + userInfo._id + '">http://localhost:4200/#/reset-pass/'+userInfo._id+'</a>'
+    };
+    
+    return await transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            return console.log(error);
+        }
+        console.log('Message %s sent: %s', info.messageId, info.response);
+    });
+}
+
+async function sendTrackerInviteMail(userInfo) {
+    let mailOptions = {
+        from: 'Tracker <trackermaster1912@gmail.com>',
+        to: userInfo.emailId,
+        subject: 'Tracker Invite',
+        html: '<h1>Tracker Invitation</h1><p>Hi ' +userInfo.firstName + ',</p><p>you have been invited to Tracker a personal tracker application.'
+            +'Register yourself on tracker from below link<p>'
+            + '<a href="http://localhost:4200/#/register">http://localhost:4200/#/register</a>'
     };
     
     return await transporter.sendMail(mailOptions, (error, info) => {

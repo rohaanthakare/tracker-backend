@@ -19,53 +19,65 @@ module.exports = {
 }
 
 async function saveUser(params) {
-    let searchQry = {
-        search_key: 'username',
-        search_value: params.username
-    };
-    let user = await get_user_by(searchQry);
-    if (user.length > 0) {
-        return {
-            status: false,
-            message: 'Username already exist please enter other username'
+    try {
+        console.log('-------- Inside Save user--------');
+        console.log(params);
+        // let invitedUserStatus = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', 'INVITED');
+        let newUserStatus = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', 'NEW');
+        let activeUserStatus = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', 'ACTIVE');
+        let searchQry = {
+            search_key: 'username',
+            search_value: params.username
+        };
+        let user = await get_user_by(searchQry);
+        if (user.length > 0 && user[0].userStatus.equals(activeUserStatus._id)) {
+            throw 'Username already exist please enter other username';
+        } else if (user.length > 0 && user[0].userStatus.equals(newUserStatus._id)) {
+            throw 'Username already registered';
         }
-    }
-
-    searchQry = {
-        search_key: 'emailId',
-        search_value: params.emailId
-    };
-    user = await get_user_by(searchQry);
-    if (user.length > 0) {
-        return {
-            status: false,
-            message: 'Email-Id already registered on tracker.'
+    
+        searchQry = {
+            search_key: 'emailId',
+            search_value: params.emailId
+        };
+        user = await get_user_by(searchQry);
+        if (user.length > 0) {
+            return {
+                status: false,
+                message: 'Email-Id already registered on tracker.'
+            }
         }
-    }
-
-    searchQry = {
-        search_key: 'mobileNo',
-        search_value: params.mobileNo
-    };
-    user = await get_user_by(searchQry);
-    if (user.length > 0) {
-        return {
-            status: false,
-            message: 'Mobile number is regitered on tracker.'
+    
+        searchQry = {
+            search_key: 'mobileNo',
+            search_value: params.mobileNo
+        };
+        user = await get_user_by(searchQry);
+        if (user.length > 0) {
+            return {
+                status: false,
+                message: 'Mobile number is regitered on tracker.'
+            }
         }
+    
+        let role = await RoleDao.getRoleByRoleCode(params.role);
+        params.role = role[0]._id;
+        let user_status = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', params.userStatus);
+        params.user_status = user_status._id;
+        params.password = bcrypt.hashSync(params.password, 10);
+        user = await new User(params).save();
+        if (params.userStatus === 'NEW') {
+            await TrackerMailer.sendActivationMail(user);
+        } else {
+            await TrackerMailer.sendTrackerInviteMail(params)
+        }
+        return {
+            status: true,
+            user
+        };
+    } catch (error) {
+        throw error;
     }
-
-    let role = await RoleDao.getRoleByRoleCode(params.role);
-    params.role = role[0]._id;
-    let user_status = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', params.userStatus);
-    params.user_status = user_status._id;
-    params.password = bcrypt.hashSync(params.password, 10);
-    user = await new User(params).save();
-    await TrackerMailer.sendActivationMail(user);
-    return {
-        status: true,
-        user
-    };
 }
 
 async function checkAvailability(params) {

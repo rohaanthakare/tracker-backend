@@ -10,8 +10,8 @@ function getMongoObjectId(id) {
 
 function isEmpty(input) {
     if (input && input !== null && input !== undefined) {
-        return true;
+        return false;
     }
 
-    return false;
+    return true;
 }
