@@ -28,9 +28,9 @@ async function saveUser(params) {
             search_value: params.username
         };
         let user = await get_user_by(searchQry);
-        if (user.length > 0 && user[0].userStatus.equals(activeUserStatus._id)) {
+        if (user.length > 0 && user[0].user_status.equals(activeUserStatus._id)) {
             throw 'Username already exist please enter other username';
-        } else if (user.length > 0 && user[0].userStatus.equals(newUserStatus._id)) {
+        } else if (user.length > 0 && user[0].user_status.equals(newUserStatus._id)) {
             throw 'Username already registered, but not yet activated.';
         }
     
@@ -64,7 +64,7 @@ async function saveUser(params) {
             params.password = bcrypt.hashSync(params.password, 10);
             user = await new User(params).save();
         }
-        if (params.user_status === 'NEW') {
+        if (params.user_status.equals(newUserStatus._id)) {
             await TrackerMailer.sendActivationMail(user);
         } else {
             await TrackerMailer.sendTrackerInviteMail(params)
@@ -74,7 +74,8 @@ async function saveUser(params) {
             user
         };
     } catch (error) {
-        throw error;
+        throw (typeof error === 'string') ? error
+            : 'Internal server error, please try again';
     }
 }
 

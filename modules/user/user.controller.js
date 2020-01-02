@@ -30,17 +30,17 @@ async function authenticate(req, res) {
     }
 }
 
-async function registerUser(req, res) {    
-    let response = await UserService.saveUser(req.body);
-    if(response.status) {
+async function registerUser(req, res) {
+    try {
+        let response = await UserService.saveUser(req.body);
         res.send({
             status: true,
             message: 'User registered successfully'
         });
-    } else {
+    } catch(error) {
         res.status(500).send({
             status: false,
-            message: response.message
+            message: error
         });
     }
 }
