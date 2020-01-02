@@ -20,9 +20,7 @@ module.exports = {
 
 async function saveUser(params) {
     try {
-        console.log('-------- Inside Save user--------');
-        console.log(params);
-        // let invitedUserStatus = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', 'INVITED');
+        let invitedUserStatus = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', 'INVITED');
         let newUserStatus = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', 'NEW');
         let activeUserStatus = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', 'ACTIVE');
         let searchQry = {
@@ -33,7 +31,7 @@ async function saveUser(params) {
         if (user.length > 0 && user[0].userStatus.equals(activeUserStatus._id)) {
             throw 'Username already exist please enter other username';
         } else if (user.length > 0 && user[0].userStatus.equals(newUserStatus._id)) {
-            throw 'Username already registered';
+            throw 'Username already registered, but not yet activated.';
         }
     
         searchQry = {
@@ -41,32 +39,32 @@ async function saveUser(params) {
             search_value: params.emailId
         };
         user = await get_user_by(searchQry);
-        if (user.length > 0) {
-            return {
-                status: false,
-                message: 'Email-Id already registered on tracker.'
-            }
+        if (user.length > 0 && user[0].user_status.equals(activeUserStatus._id)) {
+            throw 'Email-Id already registered on tracker.';
+        } else if (user.length > 0 && user[0].user_status.equals(newUserStatus._id)) {
+            throw 'Email id already registered on traker but not yet activated';
         }
-    
-        searchQry = {
-            search_key: 'mobileNo',
-            search_value: params.mobileNo
-        };
-        user = await get_user_by(searchQry);
-        if (user.length > 0) {
-            return {
-                status: false,
-                message: 'Mobile number is regitered on tracker.'
-            }
+
+        if(user.length > 0 && user[0].user_status.equals(invitedUserStatus._id)) {
+            params.password = bcrypt.hashSync(params.password, 10);
+            user = await User.findByIdAndUpdate(user[0]._id, {
+                user_status: newUserStatus._id,
+                username: params.username,
+                mobileNo: params.mobileNo,
+                password: params.password
+            }, {
+                upsert: true,
+                new: true
+            });
+        } else {
+            let role = await RoleDao.getRoleByRoleCode(params.role);
+            params.role = role[0]._id;
+            let user_status = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', params.user_status);
+            params.user_status = user_status._id;
+            params.password = bcrypt.hashSync(params.password, 10);
+            user = await new User(params).save();
         }
-    
-        let role = await RoleDao.getRoleByRoleCode(params.role);
-        params.role = role[0]._id;
-        let user_status = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', params.userStatus);
-        params.user_status = user_status._id;
-        params.password = bcrypt.hashSync(params.password, 10);
-        user = await new User(params).save();
-        if (params.userStatus === 'NEW') {
+        if (params.user_status === 'NEW') {
             await TrackerMailer.sendActivationMail(user);
         } else {
             await TrackerMailer.sendTrackerInviteMail(params)
@@ -118,10 +116,7 @@ async function authenticate(params) {
         let user = await get_user_by(search_query);
         let userStatusInvited = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', 'INVITED');
         if(user.length === 0 || user[0].user_status.equals(userStatusInvited._id)) {
-            return {
-                status: false,
-                message: 'User does not exist, please register'
-            };
+            throw 'User does not exist, please register';
         } else {
             let userStatusNew = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', 'NEW');
             if (user[0].user_status.equals(userStatusNew._id)) {
