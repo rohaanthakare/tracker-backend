@@ -5,6 +5,7 @@ const RoleController = require('./modules/role/role.controller');
 const UserController = require('./modules/user/user.controller');
 const PasswordController = require('./modules/password/password.controller');
 const ContactController = require('./modules/contact/contact.controller');
+const FinanceController = require('./modules/finance/finance.controller');
 
 const router = express.Router();
 // Master data API's
@@ -39,6 +40,9 @@ router.get('/get_password/:id', PasswordController.getPasswordDetail);
 router.get('/get_user_contacts', ContactController.getUserContacts);
 router.get('/get_contact_detail/:id', ContactController.getContactDetails);
 router.post('/create_contact', ContactController.createContact);
+
+// Finance Module API's
+router.post('/create_bank', FinanceController.createBank);
 
 module.exports = router;
 module.exports.ROUTES_WIHTOUT_AUTH = ['/api/authenticate_user', '/api/register_user', '/api/activate_user', '/api/reset_password'];

@@ -6,7 +6,8 @@ const BankSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    bankName: String
+    bankName: String,
+    bankLogo: String
 }, {
     versionKey: false,
     timestamps: {

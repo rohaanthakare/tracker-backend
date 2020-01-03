@@ -28,9 +28,9 @@ async function saveUser(params) {
             search_value: params.username
         };
         let user = await get_user_by(searchQry);
-        if (user.length > 0 && user[0].user_status.equals(activeUserStatus._id)) {
+        if (user.length > 0 && user[0].status.equals(activeUserStatus._id)) {
             throw 'Username already exist please enter other username';
-        } else if (user.length > 0 && user[0].user_status.equals(newUserStatus._id)) {
+        } else if (user.length > 0 && user[0].status.equals(newUserStatus._id)) {
             throw 'Username already registered, but not yet activated.';
         }
     
@@ -39,16 +39,16 @@ async function saveUser(params) {
             search_value: params.emailId
         };
         user = await get_user_by(searchQry);
-        if (user.length > 0 && user[0].user_status.equals(activeUserStatus._id)) {
+        if (user.length > 0 && user[0].status.equals(activeUserStatus._id)) {
             throw 'Email-Id already registered on tracker.';
-        } else if (user.length > 0 && user[0].user_status.equals(newUserStatus._id)) {
+        } else if (user.length > 0 && user[0].status.equals(newUserStatus._id)) {
             throw 'Email id already registered on traker but not yet activated';
         }
 
-        if(user.length > 0 && user[0].user_status.equals(invitedUserStatus._id)) {
+        if(user.length > 0 && user[0].status.equals(invitedUserStatus._id)) {
             params.password = bcrypt.hashSync(params.password, 10);
             user = await User.findByIdAndUpdate(user[0]._id, {
-                user_status: newUserStatus._id,
+                status: newUserStatus._id,
                 username: params.username,
                 mobileNo: params.mobileNo,
                 password: params.password
@@ -59,12 +59,12 @@ async function saveUser(params) {
         } else {
             let role = await RoleDao.getRoleByRoleCode(params.role);
             params.role = role[0]._id;
-            let user_status = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', params.user_status);
-            params.user_status = user_status._id;
+            let userStatus = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', params.status);
+            params.status = userStatus._id;
             params.password = bcrypt.hashSync(params.password, 10);
             user = await new User(params).save();
         }
-        if (params.user_status.equals(newUserStatus._id)) {
+        if (params.status.equals(newUserStatus._id)) {
             await TrackerMailer.sendActivationMail(user);
         } else {
             await TrackerMailer.sendTrackerInviteMail(params)
@@ -116,11 +116,11 @@ async function authenticate(params) {
         };
         let user = await get_user_by(search_query);
         let userStatusInvited = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', 'INVITED');
-        if(user.length === 0 || user[0].user_status.equals(userStatusInvited._id)) {
+        if(user.length === 0 || user[0].status.equals(userStatusInvited._id)) {
             throw 'User does not exist, please register';
         } else {
             let userStatusNew = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', 'NEW');
-            if (user[0].user_status.equals(userStatusNew._id)) {
+            if (user[0].status.equals(userStatusNew._id)) {
                 return {
                     status: false,
                     message: 'Your account is not yet activated, please verify your account'
@@ -155,7 +155,7 @@ async function activateUser(user_id) {
     let userStatusActive = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', 'ACTIVE');
     user_id = HelperService.getMongoObjectId(user_id);
     let user = await User.findByIdAndUpdate(user_id, {
-        user_status: userStatusActive._id
+        status: userStatusActive._id
     }, {
         new: true,
         upsert: true

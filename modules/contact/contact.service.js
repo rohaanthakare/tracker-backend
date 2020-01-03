@@ -35,7 +35,7 @@ async function createContact(params, current_user) {
                 newUserDetial.mobileNo = params.mobileNo;
                 newUserDetial.firstName = params.firstName;
                 newUserDetial.lastName = (params.lastName) ? params.lastName : '';
-                newUserDetial.user_status = 'INVITED';
+                newUserDetial.status = 'INVITED';
                 newUserDetial.password = 'invited';
                 newUserDetial.username = 'invited' + new Date().getTime();
                 newUserDetial.role = 'TRACKER_USER';
