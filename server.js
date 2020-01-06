@@ -8,6 +8,7 @@ const cors = require('cors');
 const config = require('./configs/global.config');
 const routes = require('./routes');
 const ROUTES_WIHTOUT_AUTH = require('./routes').ROUTES_WIHTOUT_AUTH;
+const TrackerMailer = require('./modules/global/trackermailer.service');
 
 const app = express();
 app.use(cors());
@@ -29,9 +30,15 @@ mongoose.connection.on('error', () => {
     console.log('Error while connecting to Database - ' + config.database);
 });
 
+// app.use('/mail-tester', function(req, res) {
+//     let response = TrackerMailer.sendTrackerMail();
+//     res.send({
+//         status: true,
+//         message: 'Email sending api'
+//     });
+// });
+
 app.use(function (req, res, next) {
-    console.log('-----Req header-------');
-    console.log(ROUTES_WIHTOUT_AUTH);
     if(ROUTES_WIHTOUT_AUTH.includes(req.originalUrl)) {
         console.log('----Auth not required----');
         next();

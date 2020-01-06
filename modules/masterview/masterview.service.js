@@ -4,7 +4,8 @@ const Role = require('../role/models/role.model');
 module.exports = {
     get_view_by,
     create_view,
-    getNavigationMenu
+    getNavigationMenu,
+    getToolbarActions
 }
 
 async function get_view_by(params) {
@@ -69,4 +70,29 @@ async function getNavigationMenu(current_user) {
         }
     }
     return finalRes;
+}
+
+async function getToolbarActions(params) {
+    let search_query = {
+        search_key: 'viewCode',
+        search_value: params.parentView 
+    };
+
+    let parentView = await get_view_by(search_query);
+    if (parentView.length > 0) {
+        search_query = {
+            search_key: 'parentView',
+            search_value: parentView[0]._id 
+        };
+
+        let actions = await get_view_by(search_query);
+
+        if (actions.length > 0) {
+            return actions;
+        } else {
+            return [];
+        }
+    } else {
+        return [];
+    }
 }
