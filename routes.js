@@ -43,6 +43,7 @@ router.post('/create_contact', ContactController.createContact);
 
 // Finance Module API's
 router.post('/create_bank', FinanceController.createBank);
+router.post('/create_branch', FinanceController.createBranch);
 
 module.exports = router;
 module.exports.ROUTES_WIHTOUT_AUTH = ['/api/authenticate_user', '/api/register_user', '/api/activate_user', '/api/reset_password'];
