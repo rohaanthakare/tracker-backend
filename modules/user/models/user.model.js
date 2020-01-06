@@ -24,8 +24,9 @@ const UserSchema = new mongoose.Schema({
     gender:{
         type: mongoose.Schema.Types.ObjectId
     },
-    userStatus: {
-        type: mongoose.Schema.Types.ObjectId
+    status: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'MasterData'
     },
     role:{
         type: mongoose.Schema.Types.ObjectId,

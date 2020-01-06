@@ -1,11 +1,18 @@
 const UserService = require('./user.service');
 const RoleService = require('../role/role.service');
+const TrackerMailer = require('../global/trackermailer.service');
+const User = require('./models/user.model');
+const bcrypt = require('bcryptjs');
 
 module.exports = {
     get_users,
-    register_user,
+    registerUser,
     attach_role,
-    authenticate
+    authenticate,
+    activateUser,
+    checkAvailability,
+    sendResetPasswordLink,
+    resetPassword
 }
 
 async function get_users(req, res) {
@@ -13,21 +20,27 @@ async function get_users(req, res) {
 }
 
 async function authenticate(req, res) {
-    let user = await UserService.authenticate(req.body);
-    res.send(user);
+    try {
+        let user = await UserService.authenticate(req.body);
+        res.send(user);
+    } catch (err) {
+        res.status(500).send({
+            message: 'Internal server error, please try again'
+        });
+    }
 }
 
-async function register_user(req, res) {    
-    let user = await UserService.save_user(req.body);
-    if(user) {
+async function registerUser(req, res) {
+    try {
+        let response = await UserService.saveUser(req.body);
         res.send({
             status: true,
             message: 'User registered successfully'
         });
-    } else {
-        res.send({
+    } catch(error) {
+        res.status(500).send({
             status: false,
-            message: 'Error while creating user, please try again'
+            message: error
         });
     }
 }
@@ -66,5 +79,74 @@ async function attach_role(req, res) {
             status: false,
             message: 'No User found by Username - ' + req.body.username
         });
+    }
+}
+
+async function activateUser(req, res) {   
+    let user = await UserService.activateUser(req.body.id);
+    if (user) {
+        res.send({
+            status: true,
+            message: 'User activated successfully',
+            user
+        });
+    } else {
+        res.status(500).send({
+            status: false,
+            message: 'Error while activating User, please try again'
+        });
+    }
+}
+
+async function checkAvailability(req, res) {
+    let isAvailable = await UserService.checkAvailability(req.body);
+    if (isAvailable) {
+        res.send({
+            status: true,
+            message: req.body.search_field + ' is available' 
+        });
+    } else {
+        res.send({
+            status: false,
+            message: req.body.search_field + ' is not available' 
+        });
+    }
+}
+
+async function sendResetPasswordLink(req, res) {
+    let searchQry = {
+        search_key: 'emailId',
+        search_value: req.body.emailId
+    };
+
+    let user = await UserService.get_user_by(searchQry);
+    if (user.length > 0) {
+        TrackerMailer.sendResetPassLinkMail(user[0]);
+    } else {
+        res.status(500).send({
+            status: false,
+            message: 'Email entered does not exist on tracker'
+        });
+    }
+}
+
+async function resetPassword(req, res) {
+    let user = await User.findById(req.body.userId);
+    if (user) {
+        user.password = bcrypt.hashSync(req.body.password, 10);
+        let newUser = await User.updateOne({
+            _id: user._id
+        }, user);
+        if (newUser) {
+            res.send({
+                status: true,
+                message: 'Password reset successfull, please login.'
+            });
+        }
+    } else {
+        res.status(500).send({
+            status: false,
+            message: 'Internal server error, please try again'
+        })
     }
 }
