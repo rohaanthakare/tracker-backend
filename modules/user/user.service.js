@@ -74,8 +74,7 @@ async function saveUser(params) {
             user
         };
     } catch (error) {
-        throw (typeof error === 'string') ? error
-            : 'Internal server error, please try again';
+        throw error;
     }
 }
 

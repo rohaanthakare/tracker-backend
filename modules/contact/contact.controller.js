@@ -1,3 +1,4 @@
+const GlobalEnum = require('../global/global.enumeration');
 const HelperService = require('../global/helper.service');
 const ContactService = require('./contact.service');
 
@@ -20,9 +21,9 @@ async function createContact(req, res) {
             message: 'Contact created successfully'
         });
     } catch (err) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
         res.status(500).send({
-            status: false,
-            message: 'Internal server error, please try again'
+            message: errorMsg
         });
     }
 }
