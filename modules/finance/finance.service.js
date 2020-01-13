@@ -1,10 +1,13 @@
 const Bank = require('./models/bank.model');
 const Branch = require('./models/branch.model');
+const FinancialAccount = require('./models/financial-account.model');
 const FinanceDao = require('./finance.dao');
+
 
 module.exports = {
     createBank,
-    createBranch
+    createBranch,
+    getFinancialAccounts
 }
 
 async function createBank(params) {
@@ -23,5 +26,19 @@ async function createBranch(params) {
         return branch;
     } catch (error) {
         throw (typeof error === 'string') ? error : 'Internal server error, please try again'
+    }
+}
+
+async function getFinancialAccounts(params, current_user) {
+    try {
+        let accounts = await FinancialAccount.find({
+            user: current_user._id
+        });
+        return {
+            count: accounts.length,
+            data: accounts
+        };
+    } catch (error) {
+        throw error;
     }
 }
