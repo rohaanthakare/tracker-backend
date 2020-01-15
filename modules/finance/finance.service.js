@@ -5,8 +5,8 @@ const FinanceDao = require('./finance.dao');
 
 
 module.exports = {
-    createBank,
-    createBranch,
+    createBank, getBanks,
+    createBranch, getBranches,
     getFinancialAccounts
 }
 
@@ -15,7 +15,16 @@ async function createBank(params) {
         let bank = await new Bank(params).save();
         return bank;
     } catch (error) {
-        throw (typeof error === 'string') ? error : 'Internal server error, please try again'
+        throw error;
+    }
+}
+
+async function getBanks(params, current_user) {
+    try {
+        let banks = await Bank.find();
+        return banks;
+    } catch (error) {
+        throw error;
     }
 }
 
@@ -26,6 +35,15 @@ async function createBranch(params) {
         return branch;
     } catch (error) {
         throw (typeof error === 'string') ? error : 'Internal server error, please try again'
+    }
+}
+
+async function getBranches(params, current_user) {
+    try {
+        let branches = await Branch.find();
+        return branches;
+    } catch (error) {
+        throw error;
     }
 }
 

@@ -43,7 +43,9 @@ router.post('/create_contact', ContactController.createContact);
 
 // Finance Module API's
 router.post('/create_bank', FinanceController.createBank);
+router.get('/banks', FinanceController.getBanks);
 router.post('/create_branch', FinanceController.createBranch);
+router.get('/branches', FinanceController.getBranches);
 router.get('/get_financial_accounts', FinanceController.getFinancialAccounts);
 
 module.exports = router;
