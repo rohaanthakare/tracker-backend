@@ -7,7 +7,7 @@ const FinanceDao = require('./finance.dao');
 module.exports = {
     createBank, getBanks,
     createBranch, getBranches,
-    getFinancialAccounts
+    getFinancialAccounts, createFinancialAccount
 }
 
 async function createBank(params) {
@@ -56,6 +56,19 @@ async function getFinancialAccounts(params, current_user) {
             count: accounts.length,
             data: accounts
         };
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function createFinancialAccount(params, current_user) {
+    try {
+        params.user = current_user._id;
+        params.accountType = params.accountType._id;
+        params.bank = params.bank._id;
+        params.branch = params.branch._id;
+        let account = await new FinancialAccount(params).save();
+        return account;
     } catch (error) {
         throw error;
     }
