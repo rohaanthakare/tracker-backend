@@ -48,7 +48,8 @@ router.get('/banks', FinanceController.getBanks);
 router.post('/create_branch', FinanceController.createBranch);
 router.get('/branches', FinanceController.getBranches);
 router.get('/get_financial_accounts', FinanceController.getFinancialAccounts);
-router.post('/create_financial_account', FinanceController.createFinancialAccount)
+router.post('/create_financial_account', FinanceController.createFinancialAccount);
+router.put('/update_financial_account/:id', FinanceController.updateFinancialAccount);
 
 module.exports = router;
 module.exports.ROUTES_WIHTOUT_AUTH = ['/api/authenticate_user', '/api/register_user', '/api/activate_user', '/api/reset_password'];
