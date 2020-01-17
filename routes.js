@@ -40,6 +40,7 @@ router.get('/get_password/:id', PasswordController.getPasswordDetail);
 router.get('/get_user_contacts', ContactController.getUserContacts);
 router.get('/get_contact_detail/:id', ContactController.getContactDetails);
 router.post('/create_contact', ContactController.createContact);
+router.put('/update_contact/:id', ContactController.updateContact);
 
 // Finance Module API's
 router.post('/create_bank', FinanceController.createBank);

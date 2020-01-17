@@ -6,7 +6,8 @@ const UserService = require('../user/user.service');
 module.exports = {
     createContact,
     getUserContacts,
-    getContactDetails
+    getContactDetails,
+    updateContact
 }
 
 async function getContactDetails(id) {
@@ -65,4 +66,36 @@ async function getUserContacts(params, current_user) {
         count: recCount,
         data: contacts
     };
+}
+
+async function updateContact(id, params, current_user) {
+    try {
+        if (!HelperService.isEmpty(params.email)) {
+            // Check if email exist in user
+            const fields = ['emailId'];
+            const fieldValues = [params.email];
+            let user = await UserDao.getUserBy(fields, fieldValues);
+            if (user) {
+                // If exist add tracker id
+                params.contact_tracker_id = user._id;
+            } else {
+                let newUserDetial = {};
+                // Else create user as invited and update tracker id
+                newUserDetial.emailId = params.email;
+                newUserDetial.mobileNo = params.mobileNo;
+                newUserDetial.firstName = params.firstName;
+                newUserDetial.lastName = (params.lastName) ? params.lastName : '';
+                newUserDetial.status = 'INVITED';
+                newUserDetial.password = 'invited';
+                newUserDetial.username = 'invited' + new Date().getTime();
+                newUserDetial.role = 'TRACKER_USER';
+                let newUser = await UserService.saveUser(newUserDetial);
+            }
+        }
+
+        contact = await Contact.findByIdAndUpdate(id, params);
+        return contact;
+    } catch (error) {
+        throw error;
+    }
 }

@@ -17,7 +17,7 @@ async function createContact(req, res) {
         let contact = await ContactService.createContact(req.body, req.current_user);
         res.send({
             status: true,
-            model: contact,
+            contact,
             message: 'Contact created successfully'
         });
     } catch (err) {
@@ -34,10 +34,18 @@ async function getUserContacts(req, res) {
 }
 
 async function updateContact(req, res) {
-    res.send({
-        status: true,
-        message: 'Inside updateContact method'
-    });
+    try {
+        let contact = await ContactService.updateContact(req.params.id, req.body, req.current_user);
+        res.send({
+            status: true,
+            message:'Contact updated successfully',
+            contact});
+    } catch (error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
 }
 
 async function getContactDetails(req, res) {
