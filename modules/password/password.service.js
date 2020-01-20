@@ -3,7 +3,9 @@ const Password = require('./models/password.model');
 module.exports = {
     getPasswords,
     createPassword,
-    getPasswordDetail
+    getPasswordDetail,
+    updatePassword,
+    deletePassword
 }
 
 async function getPasswords(params, current_user) {
@@ -32,4 +34,22 @@ async function createPassword(params, current_user) {
 async function getPasswordDetail(id) {
     let password = await Password.findById(id);
     return password;
+}
+
+async function updatePassword(id, params) {
+    try {
+        let password = await Password.findByIdAndUpdate(id, params);
+        return password;
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function deletePassword(id) {
+    try {
+        let password = await Password.findByIdAndDelete(id);
+        return password;
+    } catch (error) {
+        throw error;
+    }
 }

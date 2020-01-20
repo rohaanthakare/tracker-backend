@@ -35,6 +35,7 @@ router.put('/reset_password', UserController.resetPassword);
 router.get('/get_passwords', PasswordController.getPasswords);
 router.post('/create_password', PasswordController.createPassword);
 router.get('/get_password/:id', PasswordController.getPasswordDetail);
+router.put('/update_password/:id', PasswordController.updatePassword);
 
 // Contacts Module API's
 router.get('/get_user_contacts', ContactController.getUserContacts);

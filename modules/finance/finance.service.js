@@ -2,7 +2,7 @@ const Bank = require('./models/bank.model');
 const Branch = require('./models/branch.model');
 const FinancialAccount = require('./models/financial-account.model');
 const FinanceDao = require('./finance.dao');
-
+const MasterDataDao = require('../masterdata/masterdata.dao');
 
 module.exports = {
     createBank, getBanks,
@@ -63,10 +63,17 @@ async function getFinancialAccounts(params, current_user) {
 
 async function createFinancialAccount(params, current_user) {
     try {
+        let accountType = await MasterDataDao.getDataByParentAndConfig('ACCOUNT_TYPE', 'WALLET');
         params.user = current_user._id;
-        params.accountType = params.accountType._id;
-        params.bank = params.bank._id;
-        params.branch = params.branch._id;
+        params.accountType = params.accountType._id;      
+        
+        if (accountType._id.equals(params.accountType)) {
+            delete params.bank;
+            delete params.branch;
+        } else {
+            params.bank = params.bank._id;
+            params.branch = params.branch._id;
+        }
         let account = await new FinancialAccount(params).save();
         return account;
     } catch (error) {
