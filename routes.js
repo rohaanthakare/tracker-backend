@@ -49,6 +49,7 @@ router.get('/banks', FinanceController.getBanks);
 router.post('/create_branch', FinanceController.createBranch);
 router.get('/branches', FinanceController.getBranches);
 router.get('/get_financial_accounts', FinanceController.getFinancialAccounts);
+router.get('/get_financial_account/:id', FinanceController.getFinancialAccountDetail);
 router.post('/create_financial_account', FinanceController.createFinancialAccount);
 router.put('/update_financial_account/:id', FinanceController.updateFinancialAccount);
 

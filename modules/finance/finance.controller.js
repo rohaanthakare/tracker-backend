@@ -3,7 +3,7 @@ const FinanceService = require('./finance.service');
 module.exports = {
     createBank, getBanks,
     createBranch, getBranches,
-    getFinancialAccounts, createFinancialAccount, updateFinancialAccount
+    getFinancialAccounts, createFinancialAccount, updateFinancialAccount, getFinancialAccountDetail
 }
 
 async function createBank(req, res) {
@@ -99,6 +99,20 @@ async function updateFinancialAccount(req, res) {
         res.send({
             status: true,
             message:'Financial Account updated successfully',
+            account});
+    } catch (error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
+}
+
+async function getFinancialAccountDetail(req, res) {
+    try {
+        let account = await FinanceService.getFinancialAccountDetail(req.params.id, req.current_user);
+        res.send({
+            status: true,
             account});
     } catch (error) {
         let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];

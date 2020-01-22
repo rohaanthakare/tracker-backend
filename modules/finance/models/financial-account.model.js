@@ -11,6 +11,10 @@ const FinancialAccountSchema = new mongoose.Schema({
         ref: 'MasterData'
     },
     accountNumber: Number,
+    bank: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Bank'
+    },
     branch: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Branch'

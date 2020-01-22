@@ -7,7 +7,7 @@ const MasterDataDao = require('../masterdata/masterdata.dao');
 module.exports = {
     createBank, getBanks,
     createBranch, getBranches,
-    getFinancialAccounts, createFinancialAccount, updateFinancialAccount
+    getFinancialAccounts, createFinancialAccount, updateFinancialAccount, getFinancialAccountDetail
 }
 
 async function createBank(params) {
@@ -88,6 +88,21 @@ async function updateFinancialAccount(id, params, current_user) {
         params.bank = params.bank._id;
         params.branch = params.branch._id;
         let account = await FinancialAccount.findByIdAndUpdate(id, params);
+        return account;
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function getFinancialAccountDetail(id, current_user) {
+    try {
+        let account = await FinancialAccount.findById(id).populate({
+            path: 'branch'
+        }).populate({
+            path: 'bank'
+        }).populate({
+            path: 'accountType'
+        });
         return account;
     } catch (error) {
         throw error;
