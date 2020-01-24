@@ -1,9 +1,12 @@
 const GlobalEnum = require('../global/global.enumeration');
 const FinanceService = require('./finance.service');
+const FinanceWorkflow = require('./finance.workflow');
+
 module.exports = {
     createBank, getBanks,
     createBranch, getBranches,
-    getFinancialAccounts, createFinancialAccount, updateFinancialAccount, getFinancialAccountDetail
+    getFinancialAccounts, createFinancialAccount, updateFinancialAccount, getFinancialAccountDetail,
+    depositMoney
 }
 
 async function createBank(req, res) {
@@ -109,6 +112,20 @@ async function updateFinancialAccount(req, res) {
 }
 
 async function getFinancialAccountDetail(req, res) {
+    try {
+        let account = await FinanceService.getFinancialAccountDetail(req.params.id, req.current_user);
+        res.send({
+            status: true,
+            account});
+    } catch (error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
+}
+
+async function depositMoney(req, res) {
     try {
         let account = await FinanceService.getFinancialAccountDetail(req.params.id, req.current_user);
         res.send({
