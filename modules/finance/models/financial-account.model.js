@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const MasterDataDao = require('../../masterdata/masterdata.dao');
 
 const FinancialAccountSchema = new mongoose.Schema({
     accountName: {
@@ -35,4 +36,27 @@ const FinancialAccountSchema = new mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model('FinancialAccount', FinancialAccountSchema);
+FinancialAccountSchema.statics.updateAccountBalance = async function (accountId, transactionAmount, transactionTypeId) {
+    try {
+        let creditTrnsaction = await MasterDataDao.getDataByParentAndConfig('TRANS_TYPE', 'CREDIT');
+        let debitTrnsaction = await MasterDataDao.getDataByParentAndConfig('TRANS_TYPE', 'DEBIT');
+        let account = await this.findById(accountId);
+        if (transactionTypeId.equals(creditTrnsaction._id)) {
+            account.balance = account.balance + transactionAmount;
+        } else if (transactionTypeId.equals(debitTrnsaction._id)) {
+            account.balance = account.balance - transactionAmount;
+        }
+        account = await this.findByIdAndUpdate(account._id, {
+            $set: {
+                balance: account.balance
+            }
+        });
+        return account;
+    } catch (error) {
+        throw error;
+    }
+}
+
+FinancialAccount = mongoose.model('FinancialAccount', FinancialAccountSchema);
+
+module.exports = FinancialAccount;

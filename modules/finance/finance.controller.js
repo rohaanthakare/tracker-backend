@@ -1,12 +1,14 @@
 const GlobalEnum = require('../global/global.enumeration');
 const FinanceService = require('./finance.service');
 const FinanceWorkflow = require('./finance.workflow');
+const MasterDataDao = require('../masterdata/masterdata.dao');
+const HelperService = require('../global/helper.service');
 
 module.exports = {
     createBank, getBanks,
     createBranch, getBranches,
     getFinancialAccounts, createFinancialAccount, updateFinancialAccount, getFinancialAccountDetail,
-    depositMoney
+    depositMoney, getUserTransactions
 }
 
 async function createBank(req, res) {
@@ -127,10 +129,33 @@ async function getFinancialAccountDetail(req, res) {
 
 async function depositMoney(req, res) {
     try {
-        let account = await FinanceService.getFinancialAccountDetail(req.params.id, req.current_user);
+        let creditTrnsaction = await MasterDataDao.getDataByParentAndConfig('TRANS_TYPE', 'CREDIT');
+        let transactionCategory = await MasterDataDao.getDataByParentAndConfig('TRANS_CATEGORY', 'DEPOSIT');
+        let params = req.body.transactionDetail;
+        params.transactionCategory = HelperService.getMongoObjectId(transactionCategory._id);
+        params.transactionSubCategory = params.transactionSubCategory._id;
+        params.user = req.current_user._id;
+        params.account = params.account._id;
+        params.transactionType = creditTrnsaction._id; 
+        delete params.depositType;
+        let transaction = await FinanceWorkflow.createNewTransaction(params, req.current_user);
         res.send({
             status: true,
-            account});
+            message: 'Money deposited successfully, please check account balance',
+            transaction
+        });
+    } catch (error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
+}
+
+async function getUserTransactions(req, res) {
+    try {
+        let transactions = await FinanceService.getUserTransctions(req.query, req.current_user);
+        res.send(transactions);
     } catch (error) {
         let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
         res.status(500).send({

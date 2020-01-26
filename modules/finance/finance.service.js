@@ -1,13 +1,15 @@
 const Bank = require('./models/bank.model');
 const Branch = require('./models/branch.model');
 const FinancialAccount = require('./models/financial-account.model');
+const UserTransaction = require('./models/usertransaction.model');
 const FinanceDao = require('./finance.dao');
 const MasterDataDao = require('../masterdata/masterdata.dao');
 
 module.exports = {
     createBank, getBanks,
     createBranch, getBranches,
-    getFinancialAccounts, createFinancialAccount, updateFinancialAccount, getFinancialAccountDetail
+    getFinancialAccounts, createFinancialAccount, updateFinancialAccount, getFinancialAccountDetail,
+    getUserTransctions
 }
 
 async function createBank(params) {
@@ -104,6 +106,30 @@ async function getFinancialAccountDetail(id, current_user) {
             path: 'accountType'
         });
         return account;
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function getUserTransctions(params, current_user) {
+    try {
+        let transactions = await UserTransaction.find({
+            user: current_user._id
+        }).populate({
+            path: 'transactionCategory'
+        }).populate({
+            path: 'transactionSubCategory'
+        }).populate({
+            path: 'accountTransactions',
+            populate: {
+                path: 'account'
+            }
+        });
+
+        return {
+            counte: transactions.length,
+            data: transactions
+        };
     } catch (error) {
         throw error;
     }
