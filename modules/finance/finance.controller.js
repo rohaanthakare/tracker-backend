@@ -8,7 +8,7 @@ module.exports = {
     createBank, getBanks,
     createBranch, getBranches,
     getFinancialAccounts, createFinancialAccount, updateFinancialAccount, getFinancialAccountDetail,
-    depositMoney, getUserTransactions
+    depositMoney, getUserTransactions, revertTransaction
 }
 
 async function createBank(req, res) {
@@ -135,7 +135,7 @@ async function depositMoney(req, res) {
         params.transactionCategory = HelperService.getMongoObjectId(transactionCategory._id);
         params.transactionSubCategory = params.transactionSubCategory._id;
         params.user = req.current_user._id;
-        params.account = params.account._id;
+        params.account = (params.account) ? params.account._id : null;
         params.transactionType = creditTrnsaction._id; 
         delete params.depositType;
         let transaction = await FinanceWorkflow.createNewTransaction(params, req.current_user);
@@ -156,6 +156,20 @@ async function getUserTransactions(req, res) {
     try {
         let transactions = await FinanceService.getUserTransctions(req.query, req.current_user);
         res.send(transactions);
+    } catch (error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
+}
+
+async function revertTransaction(req, res) {
+    try {
+        let revertTransaction = await FinanceWorkflow.revertTransaction(req.params.id, req.current_user);
+        res.send({
+            status: true,
+            revertTransaction});
     } catch (error) {
         let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
         res.status(500).send({

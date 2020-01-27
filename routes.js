@@ -54,6 +54,7 @@ router.post('/create_financial_account', FinanceController.createFinancialAccoun
 router.put('/update_financial_account/:id', FinanceController.updateFinancialAccount);
 router.post('/deposit_money', FinanceController.depositMoney);
 router.get('/get_passbook', FinanceController.getUserTransactions);
+router.put('/revert_transaction/:id', FinanceController.revertTransaction);
 
 module.exports = router;
 module.exports.ROUTES_WIHTOUT_AUTH = ['/api/authenticate_user', '/api/register_user', '/api/activate_user', '/api/reset_password'];

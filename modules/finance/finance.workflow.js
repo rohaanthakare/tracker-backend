@@ -2,6 +2,7 @@ const UserTransaction = require('./models/usertransaction.model');
 const AccountTransaction = require('./models/accounttransaction.model');
 const FinancialAccount = require('./models/financial-account.model');
 const MasterDataDao = require('../masterdata/masterdata.dao');
+const HelperService = require('../global/helper.service');
 
 module.exports = {
     createNewTransaction,
@@ -45,8 +46,17 @@ async function revertTransaction(userTransId, current_user) {
         revertTransaction.transactionSubCategory = userTrans.transactionSubCategory;
         revertTransaction.transactionDetail = userTrans.transactionDetail;
         revertTransaction.transactionAmount = userTrans.transactionAmount;
+        revertTransaction.transactionDate = userTrans.transactionDate;
         revertTransaction.user = current_user._id;
-        
+        if (userTrans.accountTransactions.length > 0 && 
+            userTrans.accountTransactions[0].transactionType.equals(creditTrnsaction._id)) {
+            revertTransaction.transactionType = debitTrnsaction._id;
+        } else {
+            revertTransaction.transactionType = creditTrnsaction._id;
+        }
+        revertTransaction.account = (userTrans.accountTransactions.length > 0) ? userTrans.accountTransactions[0].account._id: null;
+        let revertedTrans = await createNewTransaction(revertTransaction);
+        return revertedTrans;
     } catch (error) {
         throw error;
     }
