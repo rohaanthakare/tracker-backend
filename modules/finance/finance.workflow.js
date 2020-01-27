@@ -1,6 +1,7 @@
 const UserTransaction = require('./models/usertransaction.model');
 const AccountTransaction = require('./models/accounttransaction.model');
 const FinancialAccount = require('./models/financial-account.model');
+const MasterDataDao = require('../masterdata/masterdata.dao');
 
 module.exports = {
     createNewTransaction,
@@ -30,9 +31,22 @@ async function createNewTransaction(params) {
     }
 }
 
-async function revertTransaction() {
+async function revertTransaction(userTransId, current_user) {
     try {
-        return 'Transaction reverted successfully';
+        let transactionCategory = await MasterDataDao.getDataByParentAndConfig('TRANS_CATEGORY', 'REVERT');
+        let creditTrnsaction = await MasterDataDao.getDataByParentAndConfig('TRANS_TYPE', 'CREDIT');
+        let debitTrnsaction = await MasterDataDao.getDataByParentAndConfig('TRANS_TYPE', 'DEBIT');
+        let userTrans = await UserTransaction.findById(userTransId).populate({
+            path: 'accountTransactions'
+        });
+
+        let revertTransaction = {};
+        revertTransaction.transactionCategory = transactionCategory._id;
+        revertTransaction.transactionSubCategory = userTrans.transactionSubCategory;
+        revertTransaction.transactionDetail = userTrans.transactionDetail;
+        revertTransaction.transactionAmount = userTrans.transactionAmount;
+        revertTransaction.user = current_user._id;
+        
     } catch (error) {
         throw error;
     }
