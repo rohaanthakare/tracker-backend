@@ -126,7 +126,7 @@ async function authenticate(params) {
                 };
             } else if (bcrypt.compareSync(params.password, user[0].password)) {
                 let user_info = await User.findById(user[0]._id).populate({path: 'role'});
-                let user_data = _.pick(user_info,['_id','username', 'emailId', 'mobileNo', 'role.roleCode']);
+                let user_data = _.pick(user_info,['_id','username', 'emailId', 'mobileNo', 'role.roleCode', 'firstName', 'lastName']);
                 user_data.role = user_data.role.roleCode;
                 const user_token = jwt.sign(user_data, config.token_secret, {
                     algorithm : "HS256",

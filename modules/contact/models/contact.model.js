@@ -22,10 +22,15 @@ const ContactSchema = new mongoose.Schema({
         required: true,
         ref: 'User'
     },
-    contact_tracker_id: {
+    contact_user_id: {
         type: mongoose.Schema.Types.ObjectId,
         required: false,
         ref: 'User'
+    },
+    settlementAmount: Number,
+    settlementType: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'MasterData'
     }
 }, {
     versionKey: false,

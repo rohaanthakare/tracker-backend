@@ -26,6 +26,9 @@ async function createNewTransaction(params) {
             })
         }
         // If Contact present create contact transaction and update contact settlement 
+        if(params.userContact) {
+            let contactTransParams = {};
+        }
         return userTrans;
     } catch (error) {
         throw error;
