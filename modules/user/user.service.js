@@ -47,6 +47,7 @@ async function saveUser(params) {
 
         if(user.length > 0 && user[0].status.equals(invitedUserStatus._id)) {
             params.password = bcrypt.hashSync(params.password, 10);
+            params.status = newUserStatus._id;
             user = await User.findByIdAndUpdate(user[0]._id, {
                 status: newUserStatus._id,
                 username: params.username,

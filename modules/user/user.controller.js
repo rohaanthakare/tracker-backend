@@ -3,6 +3,7 @@ const RoleService = require('../role/role.service');
 const TrackerMailer = require('../global/trackermailer.service');
 const User = require('./models/user.model');
 const bcrypt = require('bcryptjs');
+const GlobalEnum = require('../global/global.enumeration');
 
 module.exports = {
     get_users,
@@ -24,8 +25,9 @@ async function authenticate(req, res) {
         let user = await UserService.authenticate(req.body);
         res.send(user);
     } catch (err) {
+        let errorMsg = (typeof err === 'string') ? err : GlobalEnum.ERRORS[500];
         res.status(500).send({
-            message: 'Internal server error, please try again'
+            message: errorMsg
         });
     }
 }
@@ -38,9 +40,9 @@ async function registerUser(req, res) {
             message: 'User registered successfully'
         });
     } catch(error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
         res.status(500).send({
-            status: false,
-            message: error
+            message: errorMsg
         });
     }
 }
