@@ -31,7 +31,7 @@ async function createContact(params, current_user) {
             isTrackerUser = true;
             if (user) {
                 // If exist add tracker id
-                params.contact_user_id = user._id;
+                params.contact_user = user._id;
             } else {
                 let newUserDetial = {};
                 // Else create user as invited and update tracker id
@@ -44,10 +44,9 @@ async function createContact(params, current_user) {
                 newUserDetial.username = 'invited' + new Date().getTime();
                 newUserDetial.role = 'TRACKER_USER';
                 let newUser = await UserService.saveUser(newUserDetial);
-                params.contact_user_id = newUser.user._id;
+                params.contact_user = newUser.user._id;
             }
         }
-
         contact = await new Contact(params).save();
         if (isTrackerUser) {
             // create reverse contact
@@ -57,8 +56,8 @@ async function createContact(params, current_user) {
             revContactParams.lastName = userInfo.lastName;
             revContactParams.mobileNo = userInfo.mobileNo;
             revContactParams.email = userInfo.emailId;
-            revContactParams.user_id = contact.contact_user_id;
-            revContactParams.contact_user_id = userInfo._id;
+            revContactParams.user = contact.contact_user;
+            revContactParams.contact_user = userInfo._id;
             await new Contact(revContactParams).save();
         }
         return contact;
@@ -69,7 +68,7 @@ async function createContact(params, current_user) {
 
 async function getUserContacts(params, current_user) {
     let query = {};
-    query['user_id'] = current_user._id;
+    query['user'] = current_user._id;
     let recCount = await Contact.find(query).count();
     let contacts;
     if (params.start && params.limit) {        

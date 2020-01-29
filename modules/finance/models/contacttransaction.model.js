@@ -1,19 +1,19 @@
 const mongoose = require('mongoose');
 
 const ContactTransactionSchema = new mongoose.Schema({
-    from_contact: {
+    trans_contact: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
-    from_user: {
+    trans_user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
-    to_contact: {
+    other_contact: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
-    to_user: {
+    other_user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },

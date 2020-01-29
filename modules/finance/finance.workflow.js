@@ -1,7 +1,9 @@
 const UserTransaction = require('./models/usertransaction.model');
 const AccountTransaction = require('./models/accounttransaction.model');
+const Contact = require('../contact/models/contact.model');
 const FinancialAccount = require('./models/financial-account.model');
 const MasterDataDao = require('../masterdata/masterdata.dao');
+const ContactTransaction = require('./models/contacttransaction.model');
 const HelperService = require('../global/helper.service');
 
 module.exports = {
@@ -13,22 +15,35 @@ async function createNewTransaction(params) {
     try {
         // Create user transaction
         let userTrans = await new UserTransaction(params).save();
+        let accountTrans = {};
+        let contactTrans = {};
         // If account present create account transaction and update account balance
         if (params.account) {
-            let accountTrans = await new AccountTransaction(params).save();
+            accountTrans = await new AccountTransaction(params).save();
             if (accountTrans) {
                 let account = await FinancialAccount.updateAccountBalance(params.account, params.transactionAmount, params.transactionType);
             }
-            await UserTransaction.findByIdAndUpdate(userTrans._id, {
-                $push: {
-                    accountTransactions: [accountTrans._id]
-                }
-            })
         }
         // If Contact present create contact transaction and update contact settlement 
         if(params.userContact) {
             let contactTransParams = {};
+            // Need to check on this field setting in next phase
+            // contactTransParams.trans_contact
+            contactTransParams.trans_user = params.user;
+            contactTransParams.other_contact = params.userContact._id;
+            contactTransParams.other_user = params.userContact.contact_user;
+            contactTransParams.transactionType = params.transactionType;
+            contactTransParams.transactionAmount =  params.transactionAmount;
+            contactTrans = await new ContactTransaction(contactTransParams).save();
+            let contactSettlement = await Contact.updateContactSettlement(params.transactionType, params.transactionAmount, params.userContact._id, params.user);
         }
+
+        await UserTransaction.findByIdAndUpdate(userTrans._id, {
+            $push: {
+                accountTransactions: [accountTrans._id],
+                contactTransaction: [contactTrans._id]
+            }
+        });
         return userTrans;
     } catch (error) {
         throw error;

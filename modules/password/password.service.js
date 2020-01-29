@@ -10,7 +10,7 @@ module.exports = {
 
 async function getPasswords(params, current_user) {
     let query = {};
-    query['user_id'] = current_user._id;
+    query['user'] = current_user._id;
     let recCount = await Password.find(query).count();
     let passwords;
     if (params.start && params.limit) {        
@@ -26,7 +26,7 @@ async function getPasswords(params, current_user) {
 }
 
 async function createPassword(params, current_user) {
-    params.user_id = current_user._id;
+    params.user = current_user._id;
     let password = Password.createPassword(params);
     return password;
 }

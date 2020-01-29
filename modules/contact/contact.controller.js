@@ -12,7 +12,7 @@ module.exports = {
 
 async function createContact(req, res) {
     try {
-        req.body.user_id = req.current_user._id;
+        req.body.user = req.current_user._id;
         req.body.title = HelperService.getMongoObjectId(req.body.title._id);
         let contact = await ContactService.createContact(req.body, req.current_user);
         res.send({
