@@ -8,7 +8,7 @@ module.exports = {
     createContact,
     getUserContacts,
     getContactDetails,
-    updateContact
+    updateContact, getUserSettlements
 }
 
 async function getContactDetails(id) {
@@ -112,5 +112,28 @@ async function updateContact(id, params, current_user) {
         return contact;
     } catch (error) {
         throw error;
+    }
+}
+
+async function getUserSettlements(current_user) {
+    try {
+        let settlements = await Contact.find({
+            user: current_user._id,
+            $and: [{
+                settlementAmount: {
+                    $exists: true
+                }
+            }, {
+                settlementAmount: {
+                    $ne: 0
+                }
+            }]
+        }).populate({
+            path: 'settlementType'
+        });
+
+        return settlements;
+    } catch (err) {
+        throw err;
     }
 }

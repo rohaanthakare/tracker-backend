@@ -7,7 +7,7 @@ module.exports = {
     getUserContacts,
     updateContact,
     getContactDetails,
-    deleteContact
+    deleteContact, getUserSettlements
 }
 
 async function createContact(req, res) {
@@ -31,6 +31,21 @@ async function createContact(req, res) {
 async function getUserContacts(req, res) {
     let contacts = await ContactService.getUserContacts(req.query, req.current_user);
     res.send(contacts);
+}
+
+async function getUserSettlements(req, res) {
+    try {
+        let settlements = await ContactService.getUserSettlements(req.current_user);
+        res.send({
+            status: true,
+            data: settlements
+        });
+    } catch (err) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
 }
 
 async function updateContact(req, res) {
