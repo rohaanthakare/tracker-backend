@@ -124,6 +124,11 @@ async function getUserTransctions(params, current_user) {
             populate: {
                 path: 'account'
             }
+        }).populate({
+            path: 'contactTransactions',
+            populate: {
+                path: 'other_contact'
+            }
         });
 
         return {

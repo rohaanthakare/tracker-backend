@@ -41,7 +41,7 @@ async function createNewTransaction(params) {
         await UserTransaction.findByIdAndUpdate(userTrans._id, {
             $push: {
                 accountTransactions: [accountTrans._id],
-                contactTransaction: [contactTrans._id]
+                contactTransactions: [contactTrans._id]
             }
         });
         return userTrans;
@@ -57,6 +57,8 @@ async function revertTransaction(userTransId, current_user) {
         let debitTrnsaction = await MasterDataDao.getDataByParentAndConfig('TRANS_TYPE', 'DEBIT');
         let userTrans = await UserTransaction.findById(userTransId).populate({
             path: 'accountTransactions'
+        }).populate({
+            path: 'contactTransactions'
         });
 
         let revertTransaction = {};
@@ -73,6 +75,14 @@ async function revertTransaction(userTransId, current_user) {
             revertTransaction.transactionType = creditTrnsaction._id;
         }
         revertTransaction.account = (userTrans.accountTransactions.length > 0) ? userTrans.accountTransactions[0].account._id: null;
+        
+        if (userTrans.contactTransactions.length > 0 && 
+            userTrans.contactTransactions[0].transactionType.equals(creditTrnsaction._id)) {
+            revertTransaction.transactionType = debitTrnsaction._id;
+        } else {
+            revertTransaction.transactionType = creditTrnsaction._id;
+        }
+        revertTransaction.userContact = (userTrans.contactTransactions.length > 0) ? userTrans.contactTransactions[0].other_contact: null;
         let revertedTrans = await createNewTransaction(revertTransaction);
         return revertedTrans;
     } catch (error) {

@@ -16,7 +16,7 @@ const UserTransactionSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'AccountTransaction'
     }],
-    contactTransaction: [{
+    contactTransactions: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'ContactTransaction'
     }],
