@@ -7,7 +7,7 @@ const HelperService = require('../global/helper.service');
 module.exports = {
     createBank, getBanks,
     createBranch, getBranches,
-    getFinancialAccounts, createFinancialAccount, updateFinancialAccount, getFinancialAccountDetail,
+    getFinancialAccounts, createFinancialAccount, updateFinancialAccount, getFinancialAccountDetail, transferMoney,
     depositMoney, getUserTransactions, revertTransaction
 }
 
@@ -142,6 +142,35 @@ async function depositMoney(req, res) {
         res.send({
             status: true,
             message: 'Money deposited successfully, please check account balance',
+            transaction
+        });
+    } catch (error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
+}
+
+async function transferMoney(req, res) {
+    try {
+        let debitTrnsaction = await MasterDataDao.getDataByParentAndConfig('TRANS_TYPE', 'DEBIT');
+        let creditTrnsaction = await MasterDataDao.getDataByParentAndConfig('TRANS_TYPE', 'CREDIT');
+        let transactionCategory = await MasterDataDao.getDataByParentAndConfig('TRANS_CATEGORY', 'TRANSFER');
+        let params = req.body;
+        params.transactionCategory = HelperService.getMongoObjectId(transactionCategory._id);
+        params.transactionSubCategory = params.transactionSubCategory._id;
+        params.user = req.current_user._id;
+        params.fromAccount = (params.fromAccount) ? params.fromAccount._id : null;
+        params.fromAccountTransType = debitTrnsaction._id;
+        params.toAccount = (params.toAccount) ? params.toAccount._id : null;
+        params.toAccountTransType = creditTrnsaction._id;
+        params.transactionType = debitTrnsaction._id; 
+        delete params.transferType;
+        let transaction = await FinanceWorkflow.createNewTransaction(params, req.current_user);
+        res.send({
+            status: true,
+            message: 'Money transfered successfully, please check account balance',
             transaction
         });
     } catch (error) {

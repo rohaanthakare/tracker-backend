@@ -15,14 +15,41 @@ async function createNewTransaction(params) {
     try {
         // Create user transaction
         let userTrans = await new UserTransaction(params).save();
-        let accountTrans = {};
+        let accountTrans = [];
         let contactTrans = {};
         // If account present create account transaction and update account balance
         if (params.account) {
-            accountTrans = await new AccountTransaction(params).save();
+            let accountTransaction = await new AccountTransaction(params).save();
             if (accountTrans) {
                 let account = await FinancialAccount.updateAccountBalance(params.account, params.transactionAmount, params.transactionType);
             }
+            accountTrans.push(accountTransaction._id);
+        }
+        if (params.fromAccount) {
+            let accTransParams = {};
+            accTransParams.account = params.fromAccount;
+            accTransParams.transactionType = params.fromAccountTransType;
+            accTransParams.transactionDate = params.transactionDate;
+            accTransParams.transactionAmount = params.transactionAmount;
+            accTransParams.user = params.user;
+            let fromAccountTrans = await new AccountTransaction(accTransParams).save();
+            if (fromAccountTrans) {
+                await FinancialAccount.updateAccountBalance(accTransParams.account, accTransParams.transactionAmount, accTransParams.transactionType);
+            }
+            accountTrans.push(fromAccountTrans._id);
+        }
+        if (params.toAccount) {
+            let accTransParams = {};
+            accTransParams.account = params.toAccount;
+            accTransParams.transactionType = params.toAccountTransType;
+            accTransParams.transactionDate = params.transactionDate;
+            accTransParams.transactionAmount = params.transactionAmount;
+            accTransParams.user = params.user;
+            let toAccountTrans = await new AccountTransaction(accTransParams).save();
+            if (toAccountTrans) {
+                await FinancialAccount.updateAccountBalance(accTransParams.account, accTransParams.transactionAmount, accTransParams.transactionType);
+            }
+            accountTrans.push(toAccountTrans._id);
         }
         // If Contact present create contact transaction and update contact settlement 
         if(params.userContact) {
@@ -40,7 +67,7 @@ async function createNewTransaction(params) {
 
         await UserTransaction.findByIdAndUpdate(userTrans._id, {
             $push: {
-                accountTransactions: [accountTrans._id],
+                accountTransactions: accountTrans,
                 contactTransactions: [contactTrans._id]
             }
         });
