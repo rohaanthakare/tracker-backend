@@ -121,9 +121,11 @@ async function getUserTransctions(params, current_user) {
             path: 'transactionSubCategory'
         }).populate({
             path: 'accountTransactions',
-            populate: {
+            populate: [{
                 path: 'account'
-            }
+            }, {
+                path: 'transactionType'
+            }]
         }).populate({
             path: 'contactTransactions',
             populate: {

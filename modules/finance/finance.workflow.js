@@ -16,12 +16,12 @@ async function createNewTransaction(params) {
         // Create user transaction
         let userTrans = await new UserTransaction(params).save();
         let accountTrans = [];
-        let contactTrans = {};
+        let contactTrans = [];
         // If account present create account transaction and update account balance
         if (params.account) {
             let accountTransaction = await new AccountTransaction(params).save();
             if (accountTrans) {
-                let account = await FinancialAccount.updateAccountBalance(params.account, params.transactionAmount, params.transactionType);
+                await FinancialAccount.updateAccountBalance(params.account, params.transactionAmount, params.transactionType);
             }
             accountTrans.push(accountTransaction._id);
         }
@@ -61,14 +61,15 @@ async function createNewTransaction(params) {
             contactTransParams.other_user = params.userContact.contact_user;
             contactTransParams.transactionType = params.transactionType;
             contactTransParams.transactionAmount =  params.transactionAmount;
-            contactTrans = await new ContactTransaction(contactTransParams).save();
-            let contactSettlement = await Contact.updateContactSettlement(params.transactionType, params.transactionAmount, params.userContact._id, params.user);
+            contactTransaction = await new ContactTransaction(contactTransParams).save();
+            contactTrans.push(contactTransaction);
+            await Contact.updateContactSettlement(params.transactionType, params.transactionAmount, params.userContact._id, params.user);
         }
 
         await UserTransaction.findByIdAndUpdate(userTrans._id, {
             $push: {
                 accountTransactions: accountTrans,
-                contactTransactions: [contactTrans._id]
+                contactTransactions: contactTrans
             }
         });
         return userTrans;
@@ -88,20 +89,43 @@ async function revertTransaction(userTransId, current_user) {
             path: 'contactTransactions'
         });
 
+        await UserTransaction.findByIdAndUpdate(userTransId, {
+            isReverted: true
+        });
+
         let revertTransaction = {};
         revertTransaction.transactionCategory = transactionCategory._id;
         revertTransaction.transactionSubCategory = userTrans.transactionSubCategory;
         revertTransaction.transactionDetail = userTrans.transactionDetail;
         revertTransaction.transactionAmount = userTrans.transactionAmount;
-        revertTransaction.transactionDate = userTrans.transactionDate;
+        revertTransaction.transactionDate = new Date();
         revertTransaction.user = current_user._id;
-        if (userTrans.accountTransactions.length > 0 && 
-            userTrans.accountTransactions[0].transactionType.equals(creditTrnsaction._id)) {
-            revertTransaction.transactionType = debitTrnsaction._id;
-        } else {
-            revertTransaction.transactionType = creditTrnsaction._id;
+        // Single Account Transaction - Deposti, Withdraw, Expense
+        if (userTrans.accountTransactions.length === 1) {
+            if (userTrans.accountTransactions[0].transactionType.equals(creditTrnsaction._id)) {
+                revertTransaction.transactionType = debitTrnsaction._id;
+            } else {
+                revertTransaction.transactionType = creditTrnsaction._id;
+            }
+            revertTransaction.account = userTrans.accountTransactions[0].account._id;
         }
-        revertTransaction.account = (userTrans.accountTransactions.length > 0) ? userTrans.accountTransactions[0].account._id: null;
+
+        // Multi Account Transaction - During Transfer Money
+        if (userTrans.accountTransactions.length === 2) {
+            if (userTrans.accountTransactions[1].transactionType.equals(creditTrnsaction._id)) {
+                revertTransaction.fromAccountTransType = debitTrnsaction._id;
+            } else {
+                revertTransaction.fromAccountTransType = creditTrnsaction._id;
+            }
+            revertTransaction.fromAccount = userTrans.accountTransactions[1].account._id;
+
+            if (userTrans.accountTransactions[0].transactionType.equals(creditTrnsaction._id)) {
+                revertTransaction.toAccountTransType = debitTrnsaction._id;
+            } else {
+                revertTransaction.toAccountTransType = creditTrnsaction._id;
+            }
+            revertTransaction.toAccount = userTrans.accountTransactions[0].account._id;
+        }
         
         if (userTrans.contactTransactions.length > 0 && 
             userTrans.contactTransactions[0].transactionType.equals(creditTrnsaction._id)) {
