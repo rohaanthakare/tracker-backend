@@ -1,3 +1,4 @@
+const GlobalEnum = require('../global/global.enumeration');
 const HelperService = require('../global/helper.service');
 const ContactService = require('./contact.service');
 
@@ -6,23 +7,23 @@ module.exports = {
     getUserContacts,
     updateContact,
     getContactDetails,
-    deleteContact
+    deleteContact, getUserSettlements
 }
 
 async function createContact(req, res) {
     try {
-        req.body.user_id = req.current_user._id;
+        req.body.user = req.current_user._id;
         req.body.title = HelperService.getMongoObjectId(req.body.title._id);
         let contact = await ContactService.createContact(req.body, req.current_user);
         res.send({
             status: true,
-            model: contact,
+            contact,
             message: 'Contact created successfully'
         });
     } catch (err) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
         res.status(500).send({
-            status: false,
-            message: 'Internal server error, please try again'
+            message: errorMsg
         });
     }
 }
@@ -32,11 +33,34 @@ async function getUserContacts(req, res) {
     res.send(contacts);
 }
 
+async function getUserSettlements(req, res) {
+    try {
+        let settlements = await ContactService.getUserSettlements(req.current_user);
+        res.send({
+            status: true,
+            data: settlements
+        });
+    } catch (err) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
+}
+
 async function updateContact(req, res) {
-    res.send({
-        status: true,
-        message: 'Inside updateContact method'
-    });
+    try {
+        let contact = await ContactService.updateContact(req.params.id, req.body, req.current_user);
+        res.send({
+            status: true,
+            message:'Contact updated successfully',
+            contact});
+    } catch (error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
 }
 
 async function getContactDetails(req, res) {

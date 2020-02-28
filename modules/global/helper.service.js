@@ -1,11 +1,11 @@
-const mongo = require('mongodb');
+const mongoose = require('mongoose');
 module.exports = {
     getMongoObjectId,
     isEmpty
 }
 
 function getMongoObjectId(id) {
-    return new mongo.ObjectId(id);
+    return mongoose.Types.ObjectId(id);
 }
 
 function isEmpty(input) {

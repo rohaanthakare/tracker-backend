@@ -9,7 +9,7 @@ const MasterViewSchema = new mongoose.Schema({
     viewTitle: String,
     viewType: {
         type:String,
-        enum:['create','edit','list', 'view']
+        enum:['create','edit','list','view','delete']
     },
     parentView: {
         type: mongoose.Schema.Types.ObjectId

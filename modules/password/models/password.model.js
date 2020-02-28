@@ -11,7 +11,7 @@ const PasswordSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    user_id: {
+    user: {
         required: true,
         type: mongoose.Schema.Types.ObjectId
     }

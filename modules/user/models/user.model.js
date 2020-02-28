@@ -14,8 +14,7 @@ const UserSchema = new mongoose.Schema({
         required: true
     },
     mobileNo: {
-        type: Number,
-        required: true
+        type: Number
     },
     firstName: String,
     middleName: String,

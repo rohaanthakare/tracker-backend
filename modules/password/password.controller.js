@@ -3,7 +3,8 @@ const PasswordService = require('./password.service');
 module.exports = {
     getPasswords,
     createPassword,
-    getPasswordDetail
+    getPasswordDetail,
+    updatePassword
 };
 
 async function getPasswords(req, res) {
@@ -16,7 +17,7 @@ async function createPassword(req, res) {
     if (password) {
         res.send({
             status: true,
-            model: password,
+            password,
             message: 'Password created successfully'
         });
     } else {
@@ -33,4 +34,19 @@ async function getPasswordDetail(req, res) {
         status: true,
         password
     });
+}
+
+async function updatePassword(req, res) {
+    try {
+        let password = await PasswordService.updatePassword(req.params.id, req.body, req.current_user);
+        res.send({
+            status: true,
+            message:'Password updated successfully',
+            password});
+    } catch (error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
 }

@@ -35,15 +35,28 @@ router.put('/reset_password', UserController.resetPassword);
 router.get('/get_passwords', PasswordController.getPasswords);
 router.post('/create_password', PasswordController.createPassword);
 router.get('/get_password/:id', PasswordController.getPasswordDetail);
+router.put('/update_password/:id', PasswordController.updatePassword);
 
 // Contacts Module API's
 router.get('/get_user_contacts', ContactController.getUserContacts);
 router.get('/get_contact_detail/:id', ContactController.getContactDetails);
 router.post('/create_contact', ContactController.createContact);
+router.put('/update_contact/:id', ContactController.updateContact);
+router.get('/get_user_settlements', ContactController.getUserSettlements);
 
 // Finance Module API's
 router.post('/create_bank', FinanceController.createBank);
+router.get('/banks', FinanceController.getBanks);
 router.post('/create_branch', FinanceController.createBranch);
+router.get('/branches', FinanceController.getBranches);
+router.get('/get_financial_accounts', FinanceController.getFinancialAccounts);
+router.get('/get_financial_account/:id', FinanceController.getFinancialAccountDetail);
+router.post('/create_financial_account', FinanceController.createFinancialAccount);
+router.put('/update_financial_account/:id', FinanceController.updateFinancialAccount);
+router.post('/deposit_money', FinanceController.depositMoney);
+router.post('/transfer_money', FinanceController.transferMoney);
+router.get('/get_passbook', FinanceController.getUserTransactions);
+router.put('/revert_transaction/:id', FinanceController.revertTransaction);
 
 module.exports = router;
 module.exports.ROUTES_WIHTOUT_AUTH = ['/api/authenticate_user', '/api/register_user', '/api/activate_user', '/api/reset_password'];
