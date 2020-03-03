@@ -21,6 +21,7 @@ const ContactTransactionSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'MasterData'
     },
+    transactionHeadCount: Number,
     transactionAmount: Number
 }, {
     versionKey: false,

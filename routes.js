@@ -55,6 +55,7 @@ router.post('/create_financial_account', FinanceController.createFinancialAccoun
 router.put('/update_financial_account/:id', FinanceController.updateFinancialAccount);
 router.post('/deposit_money', FinanceController.depositMoney);
 router.post('/transfer_money', FinanceController.transferMoney);
+router.post('/add_expense', FinanceController.addExpense);
 router.get('/get_passbook', FinanceController.getUserTransactions);
 router.put('/revert_transaction/:id', FinanceController.revertTransaction);
 

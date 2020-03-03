@@ -66,6 +66,26 @@ async function createNewTransaction(params) {
             await Contact.updateContactSettlement(params.transactionType, params.transactionAmount, params.userContact._id, params.user);
         }
 
+        // Multi User Contact Expense Scenario 
+        if(params.userContacts && params.userContacts.length > 0) {
+            for (let index = 0; index < params.userContacts.length; index++) {
+                let currentTrans = params.userContacts[index];
+                let contactTransParams = {};
+                // Need to check on this field setting in next phase
+                // contactTransParams.trans_contact
+                contactTransParams.trans_user = params.user;
+                contactTransParams.other_contact = currentTrans._id;
+                contactTransParams.other_user = currentTrans.contact_user;
+                contactTransParams.transactionType = params.transactionType;
+                contactTransParams.transactionAmount =  currentTrans.transactionAmount;
+                contactTransParams.transactionHeadCount =  currentTrans.selectionCount;
+                
+                contactTransaction = await new ContactTransaction(contactTransParams).save();
+                contactTrans.push(contactTransaction);
+                await Contact.updateContactSettlement(params.transactionType, currentTrans.transactionAmount, currentTrans._id, params.user);
+            }
+        }
+
         await UserTransaction.findByIdAndUpdate(userTrans._id, {
             $push: {
                 accountTransactions: accountTrans,
@@ -126,14 +146,27 @@ async function revertTransaction(userTransId, current_user) {
             }
             revertTransaction.toAccount = userTrans.accountTransactions[0].account._id;
         }
-        
-        if (userTrans.contactTransactions.length > 0 && 
-            userTrans.contactTransactions[0].transactionType.equals(creditTrnsaction._id)) {
-            revertTransaction.transactionType = debitTrnsaction._id;
-        } else {
-            revertTransaction.transactionType = creditTrnsaction._id;
+        if (userTrans.contactTransactions.length > 0) {
+            if(userTrans.contactTransactions.length === 1) {
+                revertTransaction.userContact = (userTrans.contactTransactions.length > 0) ? userTrans.contactTransactions[0].other_contact: null;
+            } else {
+                revertTransaction.userContacts = [];
+                for (let index = 0; index < userTrans.contactTransactions.length; index++) {
+                    let currentContactTrans = userTrans.contactTransactions[index];
+                    if (currentContactTrans.transactionType.equals(creditTrnsaction._id)) {
+                        revertTransaction.transactionType = debitTrnsaction._id;
+                    } else {
+                        revertTransaction.transactionType = creditTrnsaction._id;
+                    }
+                    let revContactTrans = {};
+                    revContactTrans._id = currentContactTrans.other_contact;
+                    revContactTrans.contact_user = currentContactTrans.other_user;
+                    revContactTrans.transactionAmount =  currentContactTrans.transactionAmount;
+                    revContactTrans.selectionCount =  currentContactTrans.transactionHeadCount;
+                    revertTransaction.userContacts.push(revContactTrans);
+                }
+            }
         }
-        revertTransaction.userContact = (userTrans.contactTransactions.length > 0) ? userTrans.contactTransactions[0].other_contact: null;
         let revertedTrans = await createNewTransaction(revertTransaction);
         return revertedTrans;
     } catch (error) {
