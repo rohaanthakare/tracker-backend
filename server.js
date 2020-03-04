@@ -20,15 +20,15 @@ const server = app.listen(port, () => {
 });
 
 // Connect to Database
-mongoose.set('debug', true);
-mongoose.connect(config.database);
-mongoose.connection.on('connected', () => {
-    console.log('Connected to Database - ' + config.database);
-});
+// mongoose.set('debug', true);
+// mongoose.connect(config.database);
+// mongoose.connection.on('connected', () => {
+//     console.log('Connected to Database - ' + config.database);
+// });
 
-mongoose.connection.on('error', () => {
-    console.log('Error while connecting to Database - ' + config.database);
-});
+// mongoose.connection.on('error', () => {
+//     console.log('Error while connecting to Database - ' + config.database);
+// });
 
 // app.use('/mail-tester', function(req, res) {
 //     let response = TrackerMailer.sendTrackerMail();
