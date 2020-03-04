@@ -70,7 +70,7 @@ mongoose.connection.on('error', () => {
 //     }
 // });
 
-app.use('/api', routes);
+// app.use('/api', routes);
 
 app.use('/', function(req, res) {
     res.status(404).send('Invalid Endpoint');
