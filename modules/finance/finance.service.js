@@ -2,6 +2,7 @@ const Bank = require('./models/bank.model');
 const Branch = require('./models/branch.model');
 const FinancialAccount = require('./models/financial-account.model');
 const UserTransaction = require('./models/usertransaction.model');
+const ContactTransaction = require('./models/contacttransaction.model');
 const FinanceDao = require('./finance.dao');
 const MasterDataDao = require('../masterdata/masterdata.dao');
 
@@ -9,7 +10,7 @@ module.exports = {
     createBank, getBanks,
     createBranch, getBranches,
     getFinancialAccounts, createFinancialAccount, updateFinancialAccount, getFinancialAccountDetail,
-    getUserTransctions
+    getUserTransctions, getContactTransactions
 }
 
 async function createBank(params) {
@@ -113,8 +114,79 @@ async function getFinancialAccountDetail(id, current_user) {
 
 async function getUserTransctions(params, current_user) {
     try {
+        let query = {};
+        query['user'] = current_user._id;
+        let recCount = await UserTransaction.find(query).count();
+        let transactions;
+        if (params.start && params.limit) {        
+            transactions = await UserTransaction.find({
+                user: current_user._id
+            }).populate({
+                path: 'transactionCategory'
+            }).populate({
+                path: 'transactionSubCategory'
+            }).populate({
+                path: 'accountTransactions',
+                populate: [{
+                    path: 'account'
+                }, {
+                    path: 'transactionType'
+                }]
+            }).populate({
+                path: 'contactTransactions',
+                populate: {
+                    path: 'other_contact'
+                }
+            }).sort({
+                transactionDate: -1
+            }).skip(parseInt(params.start)).limit(parseInt(params.limit));
+        } else {
+            transactions = await UserTransaction.find({
+                user: current_user._id
+            }).populate({
+                path: 'transactionCategory'
+            }).populate({
+                path: 'transactionSubCategory'
+            }).populate({
+                path: 'accountTransactions',
+                populate: [{
+                    path: 'account'
+                }, {
+                    path: 'transactionType'
+                }]
+            }).populate({
+                path: 'contactTransactions',
+                populate: {
+                    path: 'other_contact'
+                }
+            }).sort({
+                transactionDate: -1
+            });
+        }
+
+        return {
+            count: recCount,
+            data: transactions
+        };
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function getContactTransactions(conatct_id, current_user) {
+    try {
+        let contactTrans = await ContactTransaction.find({
+            other_contact: conatct_id
+        }).select('_id');
+        
+        const contactTransIds = [];
+        for(let index = 0; index < contactTrans.length; index++) {
+            contactTransIds.push(contactTrans[index]._id);
+        }
         let transactions = await UserTransaction.find({
-            user: current_user._id
+            contactTransactions: {
+                $in: contactTransIds
+            }
         }).populate({
             path: 'transactionCategory'
         }).populate({
@@ -131,12 +203,10 @@ async function getUserTransctions(params, current_user) {
             populate: {
                 path: 'other_contact'
             }
+        }).sort({
+            transactionDate: -1
         });
-
-        return {
-            counte: transactions.length,
-            data: transactions
-        };
+        return transactions; 
     } catch (error) {
         throw error;
     }

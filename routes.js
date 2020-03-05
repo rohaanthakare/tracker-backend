@@ -58,6 +58,7 @@ router.post('/transfer_money', FinanceController.transferMoney);
 router.post('/add_expense', FinanceController.addExpense);
 router.get('/get_passbook', FinanceController.getUserTransactions);
 router.put('/revert_transaction/:id', FinanceController.revertTransaction);
+router.get('/get_contact_transactions/:contact_id', FinanceController.getContactTransactions);
 
 module.exports = router;
 module.exports.ROUTES_WIHTOUT_AUTH = ['/api/authenticate_user', '/api/register_user', '/api/activate_user', '/api/reset_password'];
