@@ -11,16 +11,17 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "2.4.3",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "mongoose": "^5.7.11",
-    "mongodb": "3.4.0",
-    "bcryptjs": "2.4.3",
+    "handlebars": "4.5.3",
     "jsonwebtoken": "8.5.1",
     "lodash": "4.17.15",
+    "mongodb": "3.4.0",
+    "mongoose": "^5.7.11",
     "nodemailer": "6.4.2",
-    "handlebars": "4.5.3"
+    "nodemailer-sendgrid-transport": "^0.2.0"
   },
   "devDependencies": {
     "nodemon": "^1.19.4"
