@@ -5,7 +5,7 @@ const GlobalConfig = require('../../configs/global.config');
 
 let transporter = nodemailer.createTransport(sgTransport({
     auth: {
-        api_key: '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'
+        api_key: process.env.SENDGRID_API_KEY
     }
 }));
 
