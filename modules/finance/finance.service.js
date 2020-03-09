@@ -221,7 +221,10 @@ async function getExpenseHistory(user_id) {
         let expenseHistory = await UserTransaction.aggregate([{
             $match: {
                 user: userId,
-                transactionCategory: expenseId
+                transactionCategory: expenseId,
+                isReverted: {
+                    $exists: false
+                }
             }
         },
         {
@@ -243,31 +246,54 @@ async function getExpenseHistory(user_id) {
 
 async function getMonthlyExpenseSplit(user_id) {
     try {
+        const dt = new Date();
+        const mnth = dt.getMonth() + 1;       
         let expenseConfig = await MasterDataDao.getDataByCode('EXPENSE');
         const expenseId = HelperService.getMongoObjectId(expenseConfig._id);
         const userId = HelperService.getMongoObjectId(user_id);
-        let monthly_expense_split = await UserTransaction.aggregate([{
-            $match: {
-                user: userId,
-                transactionCategory: expenseId
+        let monthly_expense_split = await UserTransaction.aggregate([
+            {
+                $project: {
+                    transactionSubCategory: 1,
+                    transactionAmount: 1,
+                    transactionCategory: 1,
+                    user: 1,
+                    transMonth: {
+                        $month: '$transactionDate'
+                    },
+                    isReverted: 1
                 }
-            }, {
-                $lookup: {
-                    "from" : "masterdatas",
-                    "localField" : "transactionSubCategory",
-                    "foreignField" : "_id",
-                    "as" : "expense_type"
+            }, { 
+                '$match': { 
+                    user: userId, 
+                    transactionCategory: expenseId,
+                    transMonth: mnth,
+                    isReverted: {
+                        $exists: false
+                    }
                 }
-            },{
-                $unwind: '$expense_type'
-            },{
-                $group: {
-                    _id: "$transactionSubCategory",
-                    'expense_tps': {'$push': '$expense_type'},
-                    total: {
-                        $sum: "$transactionAmount"}
-        }}]);
-
+            }, { 
+                '$lookup': { 
+                    from: 'masterdatas', 
+                    localField: 'transactionSubCategory', 
+                    foreignField: '_id', 
+                    as: 'expense_type' 
+                } 
+            }, { 
+                '$unwind': '$expense_type' 
+            }, { 
+                '$group': { 
+                    _id: '$transactionSubCategory', 
+                    expense_tps: { 
+                        '$push': '$expense_type' 
+                    }, 
+                    total: { 
+                        '$sum': '$transactionAmount' 
+                    } 
+                } 
+            }
+        ]);
+        
         return monthly_expense_split;
     } catch (err) {
         throw err;
