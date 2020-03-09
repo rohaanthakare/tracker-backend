@@ -30,6 +30,7 @@ router.post('/activate_user', UserController.activateUser);
 router.get('/check_availability', UserController.checkAvailability);
 router.post('/send_reset_pass_link', UserController.sendResetPasswordLink);
 router.put('/reset_password', UserController.resetPassword);
+router.get('/get_dashboard_data', UserController.getDashboardData);
 
 // Password Module API's
 router.get('/get_passwords', PasswordController.getPasswords);
@@ -58,6 +59,7 @@ router.post('/transfer_money', FinanceController.transferMoney);
 router.post('/add_expense', FinanceController.addExpense);
 router.get('/get_passbook', FinanceController.getUserTransactions);
 router.put('/revert_transaction/:id', FinanceController.revertTransaction);
+router.get('/get_contact_transactions/:contact_id', FinanceController.getContactTransactions);
 
 module.exports = router;
 module.exports.ROUTES_WIHTOUT_AUTH = ['/api/authenticate_user', '/api/register_user', '/api/activate_user', '/api/reset_password'];

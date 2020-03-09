@@ -1,13 +1,13 @@
 const nodemailer = require('nodemailer');
+const sgTransport = require('nodemailer-sendgrid-transport');
+const HelperService = require('../global/helper.service');
+const GlobalConfig = require('../../configs/global.config');
 
-let transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
+let transporter = nodemailer.createTransport(sgTransport({
     auth: {
-        user: 'trackermaster1912@gmail.com',
-        pass: 'Tracker@1912'
+        api_key: process.env.SENDGRID_API_KEY
     }
-});
+}));
 
 module.exports = {
     sendTrackerMail,
@@ -33,12 +33,20 @@ async function sendTrackerMail() {
 }
 
 async function sendActivationMail(userInfo) {
+    let mailParams = {};
+    if (userInfo.firstName) {
+        mailParams.displayName = HelperService.convertToTitleCase(userInfo.firstName);
+    } else {
+        mailParams.displayName = HelperService.convertToTitleCase(userInfo.username);
+    }
     let mailOptions = {
         from: 'Tracker <trackermaster1912@gmail.com>',
         to: userInfo.emailId,
         subject: 'Welcome to Tracker',
-        html: '<h1>Welcome to Tracker</h1><p>Hi ' +userInfo.firstName + ',</p><p>Please click below link to activate your tracker account<p>'
-            + '<a href="http://localhost:4200/#/activate-user/' + userInfo._id + '">http://localhost:4200/#/activate-user/'+userInfo._id+'</a>'
+        html: `<h1>Welcome to Tracker</h1>
+            <p>Hi ${mailParams.displayName},</p>
+            <p>Please click below link to activate your tracker account<p>
+            <a href="${GlobalConfig.APP_URL}activate-user/${userInfo._id}">Activate</a>`
     };
     
     return await transporter.sendMail(mailOptions, (error, info) => {

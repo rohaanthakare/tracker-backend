@@ -2,14 +2,16 @@ const Bank = require('./models/bank.model');
 const Branch = require('./models/branch.model');
 const FinancialAccount = require('./models/financial-account.model');
 const UserTransaction = require('./models/usertransaction.model');
+const ContactTransaction = require('./models/contacttransaction.model');
 const FinanceDao = require('./finance.dao');
 const MasterDataDao = require('../masterdata/masterdata.dao');
+const HelperService = require('../global/helper.service');
 
 module.exports = {
     createBank, getBanks,
     createBranch, getBranches,
     getFinancialAccounts, createFinancialAccount, updateFinancialAccount, getFinancialAccountDetail,
-    getUserTransctions
+    getUserTransctions, getContactTransactions, getMonthlyExpenseSplit, getExpenseHistory
 }
 
 async function createBank(params) {
@@ -49,10 +51,10 @@ async function getBranches(params, current_user) {
     }
 }
 
-async function getFinancialAccounts(params, current_user) {
+async function getFinancialAccounts(user_id) {
     try {
         let accounts = await FinancialAccount.find({
-            user: current_user._id
+            user: user_id
         });
         return {
             count: accounts.length,
@@ -113,8 +115,79 @@ async function getFinancialAccountDetail(id, current_user) {
 
 async function getUserTransctions(params, current_user) {
     try {
+        let query = {};
+        query['user'] = current_user._id;
+        let recCount = await UserTransaction.find(query).count();
+        let transactions;
+        if (params.start && params.limit) {        
+            transactions = await UserTransaction.find({
+                user: current_user._id
+            }).populate({
+                path: 'transactionCategory'
+            }).populate({
+                path: 'transactionSubCategory'
+            }).populate({
+                path: 'accountTransactions',
+                populate: [{
+                    path: 'account'
+                }, {
+                    path: 'transactionType'
+                }]
+            }).populate({
+                path: 'contactTransactions',
+                populate: {
+                    path: 'other_contact'
+                }
+            }).sort({
+                transactionDate: -1
+            }).skip(parseInt(params.start)).limit(parseInt(params.limit));
+        } else {
+            transactions = await UserTransaction.find({
+                user: current_user._id
+            }).populate({
+                path: 'transactionCategory'
+            }).populate({
+                path: 'transactionSubCategory'
+            }).populate({
+                path: 'accountTransactions',
+                populate: [{
+                    path: 'account'
+                }, {
+                    path: 'transactionType'
+                }]
+            }).populate({
+                path: 'contactTransactions',
+                populate: {
+                    path: 'other_contact'
+                }
+            }).sort({
+                transactionDate: -1
+            });
+        }
+
+        return {
+            count: recCount,
+            data: transactions
+        };
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function getContactTransactions(conatct_id, current_user) {
+    try {
+        let contactTrans = await ContactTransaction.find({
+            other_contact: conatct_id
+        }).select('_id');
+        
+        const contactTransIds = [];
+        for(let index = 0; index < contactTrans.length; index++) {
+            contactTransIds.push(contactTrans[index]._id);
+        }
         let transactions = await UserTransaction.find({
-            user: current_user._id
+            contactTransactions: {
+                $in: contactTransIds
+            }
         }).populate({
             path: 'transactionCategory'
         }).populate({
@@ -131,13 +204,98 @@ async function getUserTransctions(params, current_user) {
             populate: {
                 path: 'other_contact'
             }
+        }).sort({
+            transactionDate: -1
         });
-
-        return {
-            counte: transactions.length,
-            data: transactions
-        };
+        return transactions; 
     } catch (error) {
         throw error;
+    }
+}
+
+async function getExpenseHistory(user_id) {
+    try {
+        let expenseConfig = await MasterDataDao.getDataByCode('EXPENSE');
+        const expenseId = HelperService.getMongoObjectId(expenseConfig._id);
+        const userId = HelperService.getMongoObjectId(user_id);
+        let expenseHistory = await UserTransaction.aggregate([{
+            $match: {
+                user: userId,
+                transactionCategory: expenseId,
+                isReverted: {
+                    $exists: false
+                }
+            }
+        },
+        {
+            $group: {
+                _id: {
+                    month: {$month: "$transactionDate"},
+                    year: {$year: "$transactionDate"},
+                },
+                total: {
+                    $sum: '$transactionAmount'
+                }
+            }
+        }]);
+        return expenseHistory;
+    } catch (err) {
+        throw err;
+    }
+}
+
+async function getMonthlyExpenseSplit(user_id) {
+    try {
+        const dt = new Date();
+        const mnth = dt.getMonth() + 1;       
+        let expenseConfig = await MasterDataDao.getDataByCode('EXPENSE');
+        const expenseId = HelperService.getMongoObjectId(expenseConfig._id);
+        const userId = HelperService.getMongoObjectId(user_id);
+        let monthly_expense_split = await UserTransaction.aggregate([
+            {
+                $project: {
+                    transactionSubCategory: 1,
+                    transactionAmount: 1,
+                    transactionCategory: 1,
+                    user: 1,
+                    transMonth: {
+                        $month: '$transactionDate'
+                    },
+                    isReverted: 1
+                }
+            }, { 
+                '$match': { 
+                    user: userId, 
+                    transactionCategory: expenseId,
+                    transMonth: mnth,
+                    isReverted: {
+                        $exists: false
+                    }
+                }
+            }, { 
+                '$lookup': { 
+                    from: 'masterdatas', 
+                    localField: 'transactionSubCategory', 
+                    foreignField: '_id', 
+                    as: 'expense_type' 
+                } 
+            }, { 
+                '$unwind': '$expense_type' 
+            }, { 
+                '$group': { 
+                    _id: '$transactionSubCategory', 
+                    expense_tps: { 
+                        '$push': '$expense_type' 
+                    }, 
+                    total: { 
+                        '$sum': '$transactionAmount' 
+                    } 
+                } 
+            }
+        ]);
+        
+        return monthly_expense_split;
+    } catch (err) {
+        throw err;
     }
 }

@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 module.exports = {
     getMongoObjectId,
-    isEmpty
+    isEmpty,
+    convertToTitleCase
 }
 
 function getMongoObjectId(id) {
@@ -15,3 +16,12 @@ function isEmpty(input) {
 
     return true;
 }
+
+function convertToTitleCase(inputStr) {
+    let returnStr = '';
+    if (inputStr && inputStr !== null) {
+      inputStr = inputStr.toLowerCase();
+      returnStr = inputStr.charAt(0).toUpperCase() + inputStr.slice(1);
+    }
+    return returnStr;
+  }
