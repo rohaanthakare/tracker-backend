@@ -7,6 +7,7 @@ const MasterDataSchema = new mongoose.Schema({
         unique: true
     },
     configName: String,
+    configDesc: String,
     parentConfig: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'MasterData',
