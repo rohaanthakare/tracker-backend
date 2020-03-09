@@ -4,6 +4,7 @@ const TrackerMailer = require('../global/trackermailer.service');
 const User = require('./models/user.model');
 const bcrypt = require('bcryptjs');
 const GlobalEnum = require('../global/global.enumeration');
+const FinanceService = require('../finance/finance.service');
 
 module.exports = {
     get_users,
@@ -13,7 +14,8 @@ module.exports = {
     activateUser,
     checkAvailability,
     sendResetPasswordLink,
-    resetPassword
+    resetPassword,
+    getDashboardData
 }
 
 async function get_users(req, res) {
@@ -150,5 +152,25 @@ async function resetPassword(req, res) {
             status: false,
             message: 'Internal server error, please try again'
         })
+    }
+}
+
+async function getDashboardData(req, res) {
+    try {
+        let accounts = await FinanceService.getFinancialAccounts(req.current_user._id);
+        let expenseSplit = await FinanceService.getMonthlyExpenseSplit(req.current_user._id);
+        let expenseHistory = await FinanceService.getExpenseHistory(req.current_user._id);
+        res.send({
+            status: true,
+            message: 'Dashboard data fetched successfully',
+            accounts: accounts.data,
+            expenseSplit,
+            expenseHistory
+        });
+    } catch(error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
     }
 }

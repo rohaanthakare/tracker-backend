@@ -5,12 +5,13 @@ const UserTransaction = require('./models/usertransaction.model');
 const ContactTransaction = require('./models/contacttransaction.model');
 const FinanceDao = require('./finance.dao');
 const MasterDataDao = require('../masterdata/masterdata.dao');
+const HelperService = require('../global/helper.service');
 
 module.exports = {
     createBank, getBanks,
     createBranch, getBranches,
     getFinancialAccounts, createFinancialAccount, updateFinancialAccount, getFinancialAccountDetail,
-    getUserTransctions, getContactTransactions
+    getUserTransctions, getContactTransactions, getMonthlyExpenseSplit, getExpenseHistory
 }
 
 async function createBank(params) {
@@ -50,10 +51,10 @@ async function getBranches(params, current_user) {
     }
 }
 
-async function getFinancialAccounts(params, current_user) {
+async function getFinancialAccounts(user_id) {
     try {
         let accounts = await FinancialAccount.find({
-            user: current_user._id
+            user: user_id
         });
         return {
             count: accounts.length,
@@ -209,5 +210,66 @@ async function getContactTransactions(conatct_id, current_user) {
         return transactions; 
     } catch (error) {
         throw error;
+    }
+}
+
+async function getExpenseHistory(user_id) {
+    try {
+        let expenseConfig = await MasterDataDao.getDataByCode('EXPENSE');
+        const expenseId = HelperService.getMongoObjectId(expenseConfig._id);
+        const userId = HelperService.getMongoObjectId(user_id);
+        let expenseHistory = await UserTransaction.aggregate([{
+            $match: {
+                user: userId,
+                transactionCategory: expenseId
+            }
+        },
+        {
+            $group: {
+                _id: {
+                    month: {$month: "$transactionDate"},
+                    year: {$year: "$transactionDate"},
+                },
+                total: {
+                    $sum: '$transactionAmount'
+                }
+            }
+        }]);
+        return expenseHistory;
+    } catch (err) {
+        throw err;
+    }
+}
+
+async function getMonthlyExpenseSplit(user_id) {
+    try {
+        let expenseConfig = await MasterDataDao.getDataByCode('EXPENSE');
+        const expenseId = HelperService.getMongoObjectId(expenseConfig._id);
+        const userId = HelperService.getMongoObjectId(user_id);
+        let monthly_expense_split = await UserTransaction.aggregate([{
+            $match: {
+                user: userId,
+                transactionCategory: expenseId
+                }
+            }, {
+                $lookup: {
+                    "from" : "masterdatas",
+                    "localField" : "transactionSubCategory",
+                    "foreignField" : "_id",
+                    "as" : "expense_type"
+                }
+            },{
+                $unwind: '$expense_type'
+            },{
+                $group: {
+                    _id: "$transactionSubCategory",
+                    'expense_tps': {'$push': '$expense_type'},
+                    total: {
+                        $sum: "$transactionAmount"}
+        }}]);
+
+        return monthly_expense_split;
+    } catch (err) {
+        throw err;
     }
 }

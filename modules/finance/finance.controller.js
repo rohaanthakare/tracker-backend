@@ -73,7 +73,7 @@ async function getBranches(req, res) {
 
 async function getFinancialAccounts(req, res) {
     try {
-        let accounts = await FinanceService.getFinancialAccounts(req.body, req.current_user);
+        let accounts = await FinanceService.getFinancialAccounts(req.current_user._id);
         res.send(accounts);
     } catch (error) {
         let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
