@@ -3,6 +3,7 @@ const Branch = require('./models/branch.model');
 const FinancialAccount = require('./models/financial-account.model');
 const UserTransaction = require('./models/usertransaction.model');
 const ContactTransaction = require('./models/contacttransaction.model');
+const FinancialProfile = require('./models/financial-profile.model');
 const FinanceDao = require('./finance.dao');
 const MasterDataDao = require('../masterdata/masterdata.dao');
 const HelperService = require('../global/helper.service');
@@ -11,7 +12,8 @@ module.exports = {
     createBank, getBanks,
     createBranch, getBranches,
     getFinancialAccounts, createFinancialAccount, updateFinancialAccount, getFinancialAccountDetail,
-    getUserTransctions, getContactTransactions, getMonthlyExpenseSplit, getExpenseHistory
+    getUserTransctions, getContactTransactions, getMonthlyExpenseSplit, getExpenseHistory,
+    createFinanceProfile, getFinancialProfile, updateFinancialProfile
 }
 
 async function createBank(params) {
@@ -298,4 +300,21 @@ async function getMonthlyExpenseSplit(user_id) {
     } catch (err) {
         throw err;
     }
+}
+
+async function createFinanceProfile(profile) {
+    let fin_profile = await new FinancialProfile(profile).save();
+    return fin_profile;
+}
+
+async function getFinancialProfile(user_id) {
+    let fin_profile = await FinancialProfile.findOne({
+        user: user_id
+    });
+    return fin_profile;
+}
+
+async function updateFinancialProfile(id, profile) {
+    let fin_profile = await FinancialProfile.findByIdAndUpdate(id, profile);
+    return fin_profile;
 }

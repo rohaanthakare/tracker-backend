@@ -8,7 +8,8 @@ module.exports = {
     createBank, getBanks,
     createBranch, getBranches,
     getFinancialAccounts, createFinancialAccount, updateFinancialAccount, getFinancialAccountDetail, transferMoney,
-    depositMoney, getUserTransactions, revertTransaction, addExpense, getContactTransactions
+    depositMoney, getUserTransactions, revertTransaction, addExpense, getContactTransactions,
+    createFinancialProfile, getFinancialProfile, updateFinancialProfile
 }
 
 async function createBank(req, res) {
@@ -240,6 +241,54 @@ async function getContactTransactions(req, res) {
             status: true,
             data: transactions
         });
+    } catch (error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
+}
+
+async function createFinancialProfile(req, res) {
+    try {
+        let params = req.body;
+        params.user = req.current_user._id;
+        let profile = await FinanceService.createFinanceProfile(params);
+        res.send({
+            status: true,
+            message:'Financial Profile created successfully',
+            profile});
+    } catch (error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
+}
+
+async function getFinancialProfile(req, res) {
+    try {
+        let profile = await FinanceService.getFinancialProfile(req.current_user._id);
+        res.send({
+            status: true,
+            profile
+        });
+    } catch (error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
+}
+
+async function updateFinancialProfile(req, res) {
+    try {
+        let profile_id = req.params.id;
+        let account = await FinanceService.updateFinancialProfile(profile_id, req.body);
+        res.send({
+            status: true,
+            message:'Financial Profile updated successfully',
+            account});
     } catch (error) {
         let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
         res.status(500).send({
