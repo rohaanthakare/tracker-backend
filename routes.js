@@ -65,4 +65,4 @@ router.get('/get_financial_profile', FinanceController.getFinancialProfile);
 router.put('/update_financial_profile/:id', FinanceController.updateFinancialProfile);
 
 module.exports = router;
-module.exports.ROUTES_WIHTOUT_AUTH = ['/api/authenticate_user', '/api/register_user', '/api/activate_user', '/api/reset_password'];
+module.exports.ROUTES_WIHTOUT_AUTH = ['/api/authenticate_user', '/api/register_user', '/api/activate_user', '/api/reset_password', '/api/send_reset_pass_link'];
