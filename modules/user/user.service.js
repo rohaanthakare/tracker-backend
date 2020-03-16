@@ -160,6 +160,11 @@ async function activateUser(user_id) {
         new: true,
         upsert: true
     });
+    let mailParam = {
+        emailId: user.emailId
+    }
+    
+    await TrackerMailer.sendWelcomeMail(mailParam);
     return user;
 }
 

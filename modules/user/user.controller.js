@@ -5,6 +5,7 @@ const User = require('./models/user.model');
 const bcrypt = require('bcryptjs');
 const GlobalEnum = require('../global/global.enumeration');
 const FinanceService = require('../finance/finance.service');
+const HelperService = require('../global/helper.service');
 
 module.exports = {
     get_users,
@@ -39,7 +40,7 @@ async function registerUser(req, res) {
         let response = await UserService.saveUser(req.body);
         res.send({
             status: true,
-            message: 'User registered successfully'
+            message: 'User registered successfully, activation link sent on registered email.'
         });
     } catch(error) {
         let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
@@ -125,7 +126,17 @@ async function sendResetPasswordLink(req, res) {
 
     let user = await UserService.get_user_by(searchQry);
     if (user.length > 0) {
-        TrackerMailer.sendResetPassLinkMail(user[0]);
+        let userInfo = user[0];
+        if (userInfo.firstName) {
+            userInfo.displayName = HelperService.convertToTitleCase(userInfo.firstName);
+        } else {
+            userInfo.displayName = HelperService.convertToTitleCase(userInfo.username);
+        }
+        await TrackerMailer.sendResetPassLinkMail(userInfo);
+        res.send({
+            status: true,
+            message: 'Reset password link sent to your Email, please follow the instructions.'
+        });
     } else {
         res.status(500).send({
             status: false,
