@@ -3,6 +3,7 @@ const Branch = require('./models/branch.model');
 const FinancialAccount = require('./models/financial-account.model');
 const UserTransaction = require('./models/usertransaction.model');
 const ContactTransaction = require('./models/contacttransaction.model');
+const Contact = require('../contact/models/contact.model');
 const FinancialProfile = require('./models/financial-profile.model');
 const FinanceDao = require('./finance.dao');
 const MasterDataDao = require('../masterdata/masterdata.dao');
@@ -13,7 +14,7 @@ module.exports = {
     createBranch, getBranches,
     getFinancialAccounts, createFinancialAccount, updateFinancialAccount, getFinancialAccountDetail,
     getUserTransctions, getContactTransactions, getMonthlyExpenseSplit, getExpenseHistory,
-    createFinanceProfile, getFinancialProfile, updateFinancialProfile
+    createFinanceProfile, getFinancialProfile, updateFinancialProfile, getTotalSettlements
 }
 
 async function createBank(params) {
@@ -298,6 +299,51 @@ async function getMonthlyExpenseSplit(user_id) {
         
         return monthly_expense_split;
     } catch (err) {
+        throw err;
+    }
+}
+
+async function getTotalSettlements(user_id) {
+    try {
+        const userId = HelperService.getMongoObjectId(user_id);
+        let settlements = await Contact.aggregate([{
+            $match: {
+                user: userId
+            }
+        }, { 
+            '$lookup': { 
+                from: 'masterdatas', 
+                localField: 'settlementType', 
+                foreignField: '_id', 
+                as: 'settlement_type' 
+            } 
+        }, { 
+            '$unwind': '$settlement_type' 
+        }, { 
+            '$group': { 
+                _id: '$settlementType', 
+                settlment_tps: { 
+                    '$push': '$settlement_type' 
+                }, 
+                total: { 
+                    '$sum': '$settlementAmount' 
+                } 
+            } 
+        }]);
+        let finalSettlement = {};
+        if (settlements.length === 1) {
+            const key1 = settlements[0].settlment_tps[0].configCode;
+            finalSettlement[key1] = settlements[0].total;
+        } else if (settlements.length === 2){
+            const key2 = settlements[1].settlment_tps[0].configCode;
+            finalSettlement[key2] = settlements[1].total;
+        } else {
+            finalSettlement['MONEY_TO_GIVE'] = 0;
+            finalSettlement['MONEY_TO_TAKE'] = 0;
+        }
+        return finalSettlement;
+    } catch (err) {
+        console.log(err);
         throw err;
     }
 }

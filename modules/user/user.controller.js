@@ -171,12 +171,14 @@ async function getDashboardData(req, res) {
         let accounts = await FinanceService.getFinancialAccounts(req.current_user._id);
         let expenseSplit = await FinanceService.getMonthlyExpenseSplit(req.current_user._id);
         let expenseHistory = await FinanceService.getExpenseHistory(req.current_user._id);
+        let settlements = await FinanceService.getTotalSettlements(req.current_user._id);
         res.send({
             status: true,
             message: 'Dashboard data fetched successfully',
             accounts: accounts.data,
             expenseSplit,
-            expenseHistory
+            expenseHistory,
+            settlements
         });
     } catch(error) {
         let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
