@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
+const path = require('path');
 const cors = require('cors');
 
 // Application Imports
@@ -38,8 +40,10 @@ mongoose.connection.on('error', () => {
 //     });
 // });
 
-app.use(function (req, res, next) {
-    if(ROUTES_WIHTOUT_AUTH.includes(req.originalUrl)) {
+app.use("/bank-logo", express.static(path.join(__dirname, 'public/bank_logos')));
+
+app.use(function (req, res, next) {  
+    if(ROUTES_WIHTOUT_AUTH.includes(req.originalUrl) || ROUTES_WIHTOUT_AUTH.includes(req._parsedUrl['pathname'])) {
         console.log('----Auth not required----');
         next();
     } else {

@@ -58,6 +58,8 @@ async function getFinancialAccounts(user_id) {
     try {
         let accounts = await FinancialAccount.find({
             user: user_id
+        }).populate({
+            path: 'bank'
         });
         return {
             count: accounts.length,
@@ -90,10 +92,16 @@ async function createFinancialAccount(params, current_user) {
 
 async function updateFinancialAccount(id, params, current_user) {
     try {
+        let accountType = await MasterDataDao.getDataByParentAndConfig('ACCOUNT_TYPE', 'WALLET');
         params.user = current_user._id;
         params.accountType = params.accountType._id;
-        params.bank = params.bank._id;
-        params.branch = params.branch._id;
+        if (accountType._id.equals(params.accountType)) {
+            delete params.bank;
+            delete params.branch;
+        } else {
+            params.bank = params.bank._id;
+            params.branch = params.branch._id;
+        }
         let account = await FinancialAccount.findByIdAndUpdate(id, params);
         return account;
     } catch (error) {
@@ -334,6 +342,11 @@ async function getTotalSettlements(user_id) {
         if (settlements.length === 1) {
             const key1 = settlements[0].settlment_tps[0].configCode;
             finalSettlement[key1] = settlements[0].total;
+            if (key1 === 'MONEY_TO_GIVE') {
+                finalSettlement['MONEY_TO_TAKE'] = 0;
+            } else {
+                finalSettlement['MONEY_TO_GIVE'] = 0;
+            }
         } else if (settlements.length === 2){
             const key2 = settlements[1].settlment_tps[0].configCode;
             finalSettlement[key2] = settlements[1].total;
