@@ -13,6 +13,7 @@ module.exports = {
     attach_role,
     authenticate,
     activateUser,
+    activateByOtp,
     checkAvailability,
     sendResetPasswordLink,
     resetPassword,
@@ -35,12 +36,31 @@ async function authenticate(req, res) {
     }
 }
 
+async function activateByOtp(req, res) {
+    try {
+        let user = await UserService.activateByOtp(req.body);
+        if (user) {
+            res.send({
+                status: true,
+                message: 'User activated successfully',
+                user
+            });
+        }
+    } catch (err) {
+        let errorMsg = (typeof err === 'string') ? err : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
+}
+
 async function registerUser(req, res) {
     try {
-        let response = await UserService.saveUser(req.body);
+        let user = await UserService.saveUser(req.body);
         res.send({
             status: true,
-            message: 'User registered successfully, activation link sent on registered email.'
+            message: 'User registered successfully, activation link sent on registered email.',
+            user
         });
     } catch(error) {
         let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
