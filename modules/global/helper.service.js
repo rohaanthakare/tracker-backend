@@ -1,8 +1,11 @@
 const mongoose = require('mongoose');
+const _ = require('lodash');
+
 module.exports = {
     getMongoObjectId,
     isEmpty,
-    convertToTitleCase
+    convertToTitleCase,
+    generate_otp
 }
 
 function getMongoObjectId(id) {
@@ -24,4 +27,8 @@ function convertToTitleCase(inputStr) {
       returnStr = inputStr.charAt(0).toUpperCase() + inputStr.slice(1);
     }
     return returnStr;
-  }
+}
+
+async function generate_otp(){
+    return _.random(100000, 999999);
+}

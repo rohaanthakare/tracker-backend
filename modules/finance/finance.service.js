@@ -356,7 +356,6 @@ async function getTotalSettlements(user_id) {
         }
         return finalSettlement;
     } catch (err) {
-        console.log(err);
         throw err;
     }
 }

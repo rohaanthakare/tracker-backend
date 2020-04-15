@@ -7,6 +7,7 @@ const User = require('./models/user.model');
 const RoleDao = require('../role/role.dao');
 const MasterDataDao = require('../masterdata/masterdata.dao');
 const TrackerMailer = require('../global/trackermailer.service');
+const TrackerSMS = require('../global/trackersms.service');
 
 module.exports = {
     saveUser,
@@ -15,6 +16,7 @@ module.exports = {
     attach_role,
     authenticate,
     activateUser,
+    activateByOtp,
     updateUser
 }
 
@@ -63,10 +65,12 @@ async function saveUser(params) {
             let userStatus = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', params.status);
             params.status = userStatus._id;
             params.password = bcrypt.hashSync(params.password, 10);
+            params.activation_otp = await HelperService.generate_otp();
             user = await new User(params).save();
         }
         if (params.status.equals(newUserStatus._id)) {
             await TrackerMailer.sendActivationMail(user);
+            await TrackerSMS.sendActivationOtp(user);
         } else {
             await TrackerMailer.sendTrackerInviteMail(params)
         }
@@ -176,4 +180,18 @@ async function updateUser(params, current_user) {
     });
 
     return user;
+}
+
+async function activateByOtp(params) {
+    try {
+        let user = await User.findById(params.id);
+        if (user.activation_otp === params.user_otp) {
+            await activateUser(user._id);
+        } else {
+            throw 'Please enter valid OTP'
+        }
+        return user;
+    } catch (err) {
+        throw err;
+    }
 }

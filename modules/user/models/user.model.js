@@ -30,7 +30,8 @@ const UserSchema = new mongoose.Schema({
     role:{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Role'
-    }
+    },
+    activation_otp: Number
 }, {
     versionKey: false,
     timestamps: {

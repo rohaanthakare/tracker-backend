@@ -27,6 +27,7 @@ router.get('/users', UserController.get_users);
 router.post('/attach_role', UserController.attach_role);
 router.post('/authenticate_user', UserController.authenticate);
 router.post('/activate_user', UserController.activateUser);
+router.post('/activate_by_otp', UserController.activateByOtp);
 router.get('/check_availability', UserController.checkAvailability);
 router.post('/send_reset_pass_link', UserController.sendResetPasswordLink);
 router.put('/reset_password', UserController.resetPassword);
@@ -65,4 +66,5 @@ router.get('/get_financial_profile', FinanceController.getFinancialProfile);
 router.put('/update_financial_profile/:id', FinanceController.updateFinancialProfile);
 
 module.exports = router;
-module.exports.ROUTES_WIHTOUT_AUTH = ['/api/authenticate_user', '/api/register_user', '/api/activate_user', '/api/reset_password', '/api/send_reset_pass_link'];
+module.exports.ROUTES_WIHTOUT_AUTH = ['/api/authenticate_user', '/api/register_user', '/api/activate_user', '/api/activate_by_otp',
+    '/api/reset_password', '/api/send_reset_pass_link'];
