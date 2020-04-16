@@ -55,7 +55,7 @@ async function createNewTransaction(params) {
         if(params.userContact) {
             let contactTransParams = {};
             // Need to check on this field setting in next phase
-            // contactTransParams.trans_contact
+            contactTransParams.trans_contact = params.userContact.revContact;
             contactTransParams.trans_user = params.user;
             contactTransParams.other_contact = params.userContact._id;
             contactTransParams.other_user = params.userContact.contact_user;
@@ -68,21 +68,34 @@ async function createNewTransaction(params) {
 
         // Multi User Contact Expense Scenario 
         if(params.userContacts && params.userContacts.length > 0) {
+            console.log('---Inside Multi User Expense-----');
             for (let index = 0; index < params.userContacts.length; index++) {
                 let currentTrans = params.userContacts[index];
                 let contactTransParams = {};
-                // Need to check on this field setting in next phase
-                // contactTransParams.trans_contact
-                contactTransParams.trans_user = params.user;
-                contactTransParams.other_contact = currentTrans._id;
-                contactTransParams.other_user = currentTrans.contact_user;
-                contactTransParams.transactionType = params.transactionType;
-                contactTransParams.transactionAmount =  currentTrans.transactionAmount;
-                contactTransParams.transactionHeadCount =  currentTrans.selectionCount;
-                
-                contactTransaction = await new ContactTransaction(contactTransParams).save();
-                contactTrans.push(contactTransaction);
-                await Contact.updateContactSettlement(params.transactionType, currentTrans.transactionAmount, currentTrans._id, params.user);
+                if (currentTrans.isSelfUser) {
+                    // If Transaction is multi user and has self user
+                    contactTransParams.trans_user = params.user;
+                    // contactTransParams.other_contact = currentTrans._id;
+                    contactTransParams.other_user = currentTrans.contact_user;
+                    contactTransParams.transactionType = params.transactionType;
+                    contactTransParams.transactionAmount =  currentTrans.transactionAmount;
+                    contactTransParams.transactionHeadCount =  currentTrans.selectionCount;
+                    
+                    contactTransaction = await new ContactTransaction(contactTransParams).save();
+                    contactTrans.push(contactTransaction);
+                } else {
+                    contactTransParams.trans_user = params.user;
+                    contactTransParams.trans_contact = currentTrans.revContact;
+                    contactTransParams.other_contact = currentTrans._id;
+                    contactTransParams.other_user = currentTrans.contact_user;
+                    contactTransParams.transactionType = params.transactionType;
+                    contactTransParams.transactionAmount =  currentTrans.transactionAmount;
+                    contactTransParams.transactionHeadCount =  currentTrans.selectionCount;
+                    
+                    contactTransaction = await new ContactTransaction(contactTransParams).save();
+                    contactTrans.push(contactTransaction);
+                    await Contact.updateContactSettlement(params.transactionType, currentTrans.transactionAmount, currentTrans._id, params.user);
+                }
             }
         }
 
