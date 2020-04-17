@@ -58,7 +58,11 @@ async function createContact(params, current_user) {
             revContactParams.email = userInfo.emailId;
             revContactParams.user = contact.contact_user;
             revContactParams.contact_user = userInfo._id;
-            await new Contact(revContactParams).save();
+            revContactParams.revContact = contact._id;
+            let revContact = await new Contact(revContactParams).save();
+            await Contact.findByIdAndUpdate(contact._id, {
+                revContact: revContact._id
+            });
         }
         return contact;
     } catch (err) {

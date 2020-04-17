@@ -54,7 +54,8 @@ async function saveUser(params) {
                 status: newUserStatus._id,
                 username: params.username,
                 mobileNo: params.mobileNo,
-                password: params.password
+                password: params.password,
+                firstName: params.firstName
             }, {
                 upsert: true,
                 new: true

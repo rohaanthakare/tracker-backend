@@ -56,6 +56,7 @@ async function activateByOtp(req, res) {
 
 async function registerUser(req, res) {
     try {
+        req.body.firstName = req.body.username;
         let user = await UserService.saveUser(req.body);
         res.send({
             status: true,

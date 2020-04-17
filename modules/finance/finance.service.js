@@ -188,7 +188,11 @@ async function getUserTransctions(params, current_user) {
 async function getContactTransactions(conatct_id, current_user) {
     try {
         let contactTrans = await ContactTransaction.find({
-            other_contact: conatct_id
+            $or: [{ 
+                other_contact: conatct_id
+            }, { 
+                trans_contact: conatct_id 
+            }]
         }).select('_id');
         
         const contactTransIds = [];
@@ -212,9 +216,11 @@ async function getContactTransactions(conatct_id, current_user) {
             }]
         }).populate({
             path: 'contactTransactions',
-            populate: {
+            populate: [{
                 path: 'other_contact'
-            }
+            }, {
+                path: 'trans_contact'
+            }]
         }).sort({
             transactionDate: -1
         });
@@ -348,6 +354,8 @@ async function getTotalSettlements(user_id) {
                 finalSettlement['MONEY_TO_GIVE'] = 0;
             }
         } else if (settlements.length === 2){
+            const key1 = settlements[0].settlment_tps[0].configCode;
+            finalSettlement[key1] = settlements[0].total;
             const key2 = settlements[1].settlment_tps[0].configCode;
             finalSettlement[key2] = settlements[1].total;
         } else {

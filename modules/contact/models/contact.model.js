@@ -28,6 +28,10 @@ const ContactSchema = new mongoose.Schema({
         required: false,
         ref: 'User'
     },
+    revContact: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Contact'
+    },
     settlementAmount: Number,
     settlementType: {
         type: mongoose.Schema.Types.ObjectId,
