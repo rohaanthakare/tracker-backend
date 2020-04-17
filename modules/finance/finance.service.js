@@ -354,6 +354,8 @@ async function getTotalSettlements(user_id) {
                 finalSettlement['MONEY_TO_GIVE'] = 0;
             }
         } else if (settlements.length === 2){
+            const key1 = settlements[0].settlment_tps[0].configCode;
+            finalSettlement[key1] = settlements[0].total;
             const key2 = settlements[1].settlment_tps[0].configCode;
             finalSettlement[key2] = settlements[1].total;
         } else {
