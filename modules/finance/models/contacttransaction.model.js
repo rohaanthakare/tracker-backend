@@ -21,6 +21,7 @@ const ContactTransactionSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'MasterData'
     },
+    isSelfTransaction: Boolean,
     transactionHeadCount: Number,
     transactionAmount: Number
 }, {

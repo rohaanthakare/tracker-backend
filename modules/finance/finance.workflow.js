@@ -80,7 +80,7 @@ async function createNewTransaction(params) {
                     contactTransParams.transactionType = params.transactionType;
                     contactTransParams.transactionAmount =  currentTrans.transactionAmount;
                     contactTransParams.transactionHeadCount =  currentTrans.selectionCount;
-                    
+                    contactTransParams.isSelfTransaction = true;
                     contactTransaction = await new ContactTransaction(contactTransParams).save();
                     contactTrans.push(contactTransaction);
                 } else {
@@ -172,8 +172,10 @@ async function revertTransaction(userTransId, current_user) {
                         revertTransaction.transactionType = creditTrnsaction._id;
                     }
                     let revContactTrans = {};
+                    revContactTrans.isSelfUser = currentContactTrans.isSelfTransaction;
                     revContactTrans._id = currentContactTrans.other_contact;
                     revContactTrans.contact_user = currentContactTrans.other_user;
+                    revContactTrans.revContact = currentContactTrans.trans_contact;
                     revContactTrans.transactionAmount =  currentContactTrans.transactionAmount;
                     revContactTrans.selectionCount =  currentContactTrans.transactionHeadCount;
                     revertTransaction.userContacts.push(revContactTrans);
