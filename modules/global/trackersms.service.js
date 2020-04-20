@@ -10,7 +10,7 @@ const TEXTLOCAL_API_SECRET = "ix46PQGXjTc-y4Fo12TA4PtCKrUcUGYvowWdFM6mEx"
 const TEXTLOCAL_SENDER = "TXTLCL"
 
 function sendActivationOtp(user) {
-    const smsBody = `Hi, ${user.username} OTP for activating your Tracker Account is ${user.activation_otp}`;
+    const smsBody = `Hi ${user.username}, OTP for activating your Tracker Account is ${user.activation_otp}`;
     return sendSMS(user.mobileNo, smsBody);
 }
 
