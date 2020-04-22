@@ -8,6 +8,7 @@ const RoleDao = require('../role/role.dao');
 const MasterDataDao = require('../masterdata/masterdata.dao');
 const TrackerMailer = require('../global/trackermailer.service');
 const TrackerSMS = require('../global/trackersms.service');
+const FinanceService = require('../finance/finance.service');
 
 module.exports = {
     saveUser,
@@ -17,7 +18,7 @@ module.exports = {
     authenticate,
     activateUser,
     activateByOtp,
-    updateUser
+    updateUser, getDailyStatus
 }
 
 async function saveUser(params) {
@@ -192,6 +193,23 @@ async function activateByOtp(params) {
             throw 'Please enter valid OTP'
         }
         return user;
+    } catch (err) {
+        throw err;
+    }
+}
+
+async function getDailyStatus(user_id) {
+    try {
+        let settlements = await FinanceService.getTotalSettlements(user_id);
+        let balance = await FinanceService.getTotalBalance(user_id);
+        let expense = await FinanceService.getTotalMonthlyExpense(user_id);
+        let transactions = await FinanceService.getTodaysTransactions(user_id);
+        return {
+            settlements,
+            balance,
+            expense,
+            transactions
+        };
     } catch (err) {
         throw err;
     }

@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const path = require('path');
 const cors = require('cors');
+const Agenda = require('agenda');
 
 // Application Imports
 const config = require('./configs/global.config');
@@ -26,6 +27,13 @@ mongoose.set('debug', true);
 mongoose.connect(config.database);
 mongoose.connection.on('connected', () => {
     console.log('Connected to Database - ' + config.database);
+    agenda = new Agenda({
+        db: {
+            address: config.database
+        }
+    });
+
+    require('./agenda.sch');
 });
 
 mongoose.connection.on('error', () => {
@@ -41,6 +49,7 @@ mongoose.connection.on('error', () => {
 // });
 
 app.use("/bank-logo", express.static(path.join(__dirname, 'public/bank_logos')));
+app.use("/mailImage", express.static(path.join(__dirname, 'public/images')));
 
 app.use(function (req, res, next) {  
     if(ROUTES_WIHTOUT_AUTH.includes(req.originalUrl) || ROUTES_WIHTOUT_AUTH.includes(req._parsedUrl['pathname'])) {
