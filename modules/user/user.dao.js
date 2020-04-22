@@ -1,8 +1,9 @@
 const User = require('./models/user.model');
+const Role = require('../role/models/role.model');
 
 module.exports = {
     getUserBy,
-    getUsersBy
+    getUsersByRole
 }
 
 async function getUserBy(fields, values) {
@@ -15,6 +16,18 @@ async function getUserBy(fields, values) {
     return user;
 }
 
-async function getUsersBy(field, value) {
-    
+async function getUsersByRole(roleCd) {
+    try {
+        let role = await Role.findOne({
+            roleCode: roleCd
+        });
+
+        let users = await User.find({
+            role: role._id
+        });
+
+        return users;
+    } catch (error) {
+        throw error;
+    }
 }

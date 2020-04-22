@@ -2,6 +2,9 @@ const nodemailer = require('nodemailer');
 const sgTransport = require('nodemailer-sendgrid-transport');
 const HelperService = require('../global/helper.service');
 const GlobalConfig = require('../../configs/global.config');
+const path = require('path');
+const templateDir = path.resolve(__dirname, '../public/mail_templates');
+const EmailTemplates = require('email-templates');
 
 let transporter = nodemailer.createTransport(sgTransport({
     auth: {
@@ -15,6 +18,7 @@ module.exports = {
     sendResetPassLinkMail,
     sendTrackerInviteMail,
     sendWelcomeMail,
+    sendDailyStatusMail,
     getWelcomeMailMessage
 }
 
@@ -42,6 +46,34 @@ async function sendWelcomeMail(userInfo) {
         }
         console.log('Message %s sent: %s', info.messageId, info.response);
     });
+}
+
+async function sendDailyStatusMail(mailParams) {
+    let template = new EmailTemplates();
+    template.render('../public/mail_templates/daily_status_mail/daily_status_mail.pug', {
+        name: mailParams.name,
+        mailDate: mailParams.mailDate,
+        balance: mailParams.balance,
+        expense: mailParams.expense,
+        moneyToTake: mailParams.moneyToTake,
+        moneyToGive: mailParams.moneyToGive,
+        transactions: mailParams.transactions
+    }).then( async (mailMessage) => {
+        let mailOptions = {
+            from: 'Tracker <trackermaster1912@gmail.com>',
+            to: mailParams.emailId,
+            subject: `Tracker Statement for ${mailParams.mailDate}`,
+            html: mailMessage
+        };
+    
+        return await transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                return console.log(error);
+            }
+            console.log('Status Mail sent to : ' + mailParams.emailId);
+        });
+    });
+
 }
 
 async function sendTrackerMail() {

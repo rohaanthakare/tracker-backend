@@ -1,0 +1,39 @@
+doctype html  
+html(lang='en')  
+ head
+    style
+        include ./style.css
+ body
+   div.row.header-class Tracker
+   div.row
+    div.col-12.col-sm-12.col-md-12.col-lg-12.col-xl-12
+     p Hi #{name},
+     p Below is your financial status on #{mailDate}
+   div.row
+    div.col-12.col-sm-6.col-md-6.col-lg-3.col-xl-3
+     div.widget-class
+      div.title-class Rs. #{balance}
+      div.sub-title-class BALANCE
+    div.col-12.col-sm-6.col-md-6.col-lg-3.col-xl-3
+     div.widget-class
+      div.title-class Rs. #{expense}
+      div.sub-title-class EXPENSE
+    div.col-12.col-sm-6.col-md-6.col-lg-3.col-xl-3
+     div.widget-class
+      div.title-class Rs. #{moneyToGive}
+      div.sub-title-class MONEY TO GIVE
+    div.col-12.col-sm-6.col-md-6.col-lg-3.col-xl-3
+     div.widget-class
+      div.title-class Rs. #{moneyToTake}
+      div.sub-title-class MONEY TO TAKE
+    div.row
+     div.col-12.col-sm-12.col-md-12.col-lg-12.col-xl-12
+      div.trans_title Transactions
+      table.trans-table
+       tr.trans_header
+        td Details
+        td Amount
+       each trans in transactions
+        tr.trans_details
+         td #{trans.transactionCategory} - #{trans.transactionSubCategory} - #{trans.transactionDetail}
+         td Rs. #{trans.transactionAmount}

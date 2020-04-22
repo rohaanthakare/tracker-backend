@@ -8,13 +8,15 @@ const FinancialProfile = require('./models/financial-profile.model');
 const FinanceDao = require('./finance.dao');
 const MasterDataDao = require('../masterdata/masterdata.dao');
 const HelperService = require('../global/helper.service');
+const moment = require('moment');
 
 module.exports = {
     createBank, getBanks,
     createBranch, getBranches,
     getFinancialAccounts, createFinancialAccount, updateFinancialAccount, getFinancialAccountDetail,
     getUserTransctions, getContactTransactions, getMonthlyExpenseSplit, getExpenseHistory,
-    createFinanceProfile, getFinancialProfile, updateFinancialProfile, getTotalSettlements
+    createFinanceProfile, getFinancialProfile, updateFinancialProfile, getTotalSettlements, getTotalBalance, getTotalMonthlyExpense,
+    getTodaysTransactions
 }
 
 async function createBank(params) {
@@ -383,4 +385,86 @@ async function getFinancialProfile(user_id) {
 async function updateFinancialProfile(id, profile) {
     let fin_profile = await FinancialProfile.findByIdAndUpdate(id, profile);
     return fin_profile;
+}
+
+async function getTotalBalance(user_id) {
+    try {
+        let balance = await FinancialAccount.aggregate([{
+            $match: {
+                user: user_id
+                }
+        }, {
+            $group: {
+            _id: '$user',
+            total: {
+                $sum: '$balance'
+            }
+        }
+        }]);
+        return balance;
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function getTotalMonthlyExpense(user_id) {
+    try {
+        const dt = new Date();
+        const mnth = dt.getMonth() + 1;
+        let expenseConfig = await MasterDataDao.getDataByCode('EXPENSE');
+        const expenseId = HelperService.getMongoObjectId(expenseConfig._id);
+        let expense = await UserTransaction.aggregate([{
+            $project: {
+                transactionAmount: 1,
+                transactionCategory: 1,
+                user: 1,
+                transMonth: {
+                    $month: '$transactionDate'
+                },
+                isReverted: 1
+            }
+        }, {
+                $match: {
+                    user: user_id,
+                    transactionCategory: expenseId,
+                    transMonth: mnth,
+                    isReverted: {
+                        $exists: false
+                    }
+                }
+            }, {
+                $group: {
+                    _id: '$user', 
+                    total: { 
+                        '$sum': '$transactionAmount' 
+                    }
+                }
+            }]);
+
+            return expense;
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function getTodaysTransactions(user_id) {
+    try {
+        const rangeStart = moment().utc().startOf('day').toDate();
+        const rangeEnd = moment().utc().endOf('day').toDate();
+        let trans = await UserTransaction.find({
+            user: user_id,
+            transactionDate: {
+                $gte: rangeStart,
+                $lte: rangeEnd
+            }
+        }).populate({
+            path: 'transactionCategory'
+        }).populate({
+            path: 'transactionSubCategory'
+        });
+
+        return trans;
+    } catch (error) {
+        throw error;
+    }
 }
