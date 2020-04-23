@@ -5,6 +5,7 @@ const HelperService = require('../global/helper.service');
 const config = require('../../configs/global.config');
 const User = require('./models/user.model');
 const RoleDao = require('../role/role.dao');
+const Role = require('../role/models/role.model');
 const MasterDataDao = require('../masterdata/masterdata.dao');
 const TrackerMailer = require('../global/trackermailer.service');
 const TrackerSMS = require('../global/trackersms.service');
@@ -121,17 +122,9 @@ async function authenticate(params) {
             search_value: params.username 
         };
         let user = await get_user_by(search_query);
-        let userStatusInvited = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', 'INVITED');
-        if(user.length === 0 || user[0].status.equals(userStatusInvited._id)) {
-            throw 'User does not exist, please register';
-        } else {
-            let userStatusNew = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', 'NEW');
-            if (user[0].status.equals(userStatusNew._id)) {
-                return {
-                    status: false,
-                    message: 'Your account is not yet activated, please verify your account'
-                };
-            } else if (bcrypt.compareSync(params.password, user[0].password)) {
+        let role = await Role.findById(user[0].role);
+        if (role.roleCode === 'ADMIN') {
+            if (bcrypt.compareSync(params.password, user[0].password)) {
                 let user_info = await User.findById(user[0]._id).populate({path: 'role'});
                 let user_data = _.pick(user_info,['_id','username', 'emailId', 'mobileNo', 'role.roleCode', 'firstName', 'lastName']);
                 user_data.role = user_data.role.roleCode;
@@ -144,12 +137,44 @@ async function authenticate(params) {
                     message: 'User authenticated successfully',
                     user: user_data,
                     user_token
-                };  
+                };
             } else {
                 return {
                     status: false,
                     message: 'Invalid Username or Password, please try again'
-                };    
+                };
+            }
+        } else {
+            let userStatusInvited = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', 'INVITED');
+            if(user.length === 0 || user[0].status.equals(userStatusInvited._id)) {
+                throw 'User does not exist, please register';
+            } else {
+                let userStatusNew = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', 'NEW');
+                if (user[0].status.equals(userStatusNew._id)) {
+                    return {
+                        status: false,
+                        message: 'Your account is not yet activated, please verify your account'
+                    };
+                } else if (bcrypt.compareSync(params.password, user[0].password)) {
+                    let user_info = await User.findById(user[0]._id).populate({path: 'role'});
+                    let user_data = _.pick(user_info,['_id','username', 'emailId', 'mobileNo', 'role.roleCode', 'firstName', 'lastName']);
+                    user_data.role = user_data.role.roleCode;
+                    const user_token = jwt.sign(user_data, config.token_secret, {
+                        algorithm : "HS256",
+                        expiresIn : 60*60*12
+                    });
+                    return {
+                        status: true,
+                        message: 'User authenticated successfully',
+                        user: user_data,
+                        user_token
+                    };  
+                } else {
+                    return {
+                        status: false,
+                        message: 'Invalid Username or Password, please try again'
+                    };    
+                }
             }
         }
     } catch (err) {
