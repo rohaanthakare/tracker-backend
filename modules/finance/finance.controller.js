@@ -9,7 +9,7 @@ module.exports = {
     createBranch, getBranches,
     getFinancialAccounts, createFinancialAccount, updateFinancialAccount, getFinancialAccountDetail, transferMoney,
     depositMoney, getUserTransactions, revertTransaction, addExpense, getContactTransactions,
-    createFinancialProfile, getFinancialProfile, updateFinancialProfile
+    createFinancialProfile, getFinancialProfile, updateFinancialProfile, addInvestment
 }
 
 async function createBank(req, res) {
@@ -224,6 +224,30 @@ async function addExpense(req, res) {
         res.send({
             status: true,
             message: 'Expense added successfully, please check account balance',
+            transaction
+        });
+    } catch (error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
+}
+
+async function addInvestment(req, res) {
+    try {
+        let debitTrnsaction = await MasterDataDao.getDataByParentAndConfig('TRANS_TYPE', 'DEBIT');
+        let transactionCategory = await MasterDataDao.getDataByParentAndConfig('TRANS_CATEGORY', 'INVESTMENT');
+        let params = req.body;
+        params.transactionCategory = HelperService.getMongoObjectId(transactionCategory._id);
+        params.transactionSubCategory = params.transactionSubCategory._id;
+        params.user = req.current_user._id;
+        params.account = (params.account) ? params.account._id : null;
+        params.transactionType = debitTrnsaction._id; 
+        let transaction = await FinanceWorkflow.createNewTransaction(params, req.current_user);
+        res.send({
+            status: true,
+            message: 'Investment added successfully, please check account balance',
             transaction
         });
     } catch (error) {
