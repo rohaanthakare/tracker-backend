@@ -19,7 +19,7 @@ agenda.on('ready', function () {
     const options = {
         timezone: 'asia/calcutta'
     }
-    agenda.every('00 16 * * *', 'Send Finance Details at EOD', options);
+    agenda.every('00 18 * * *', 'Send Finance Details at EOD', options);
     agenda.start();
 });
 
