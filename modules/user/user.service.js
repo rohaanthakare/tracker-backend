@@ -19,7 +19,8 @@ module.exports = {
     authenticate,
     activateUser,
     activateByOtp,
-    updateUser, getDailyStatus
+    updateUser, getDailyStatus,
+    getUserProfile, updateUserProfile
 }
 
 async function saveUser(params) {
@@ -122,6 +123,9 @@ async function authenticate(params) {
             search_value: params.username 
         };
         let user = await get_user_by(search_query);
+        if (user.length === 0 ) {
+            throw 'User does not exist, please register';
+        }
         let role = await Role.findById(user[0].role);
         if (role.roleCode === 'ADMIN') {
             if (bcrypt.compareSync(params.password, user[0].password)) {
@@ -235,6 +239,24 @@ async function getDailyStatus(user_id) {
             expense,
             transactions
         };
+    } catch (err) {
+        throw err;
+    }
+}
+
+async function getUserProfile(user_id) {
+    try {
+        let user = await User.findById(user_id);
+        return user;
+    } catch (err) {
+        throw err;
+    }
+}
+
+async function updateUserProfile(user_id, params) {
+    try {
+        let user = await User.findByIdAndUpdate(user_id, params);
+        return user;
     } catch (err) {
         throw err;
     }

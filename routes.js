@@ -32,6 +32,8 @@ router.get('/check_availability', UserController.checkAvailability);
 router.post('/send_reset_pass_link', UserController.sendResetPasswordLink);
 router.put('/reset_password', UserController.resetPassword);
 router.get('/get_dashboard_data', UserController.getDashboardData);
+router.get('/user_profile/:id', UserController.getUserProfile);
+router.put('/user_profile/:id', UserController.updateUserProfile);
 
 // Password Module API's
 router.get('/get_passwords', PasswordController.getPasswords);

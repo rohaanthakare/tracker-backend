@@ -17,7 +17,8 @@ module.exports = {
     checkAvailability,
     sendResetPasswordLink,
     resetPassword,
-    getDashboardData
+    getDashboardData,
+    getUserProfile, updateUserProfile
 }
 
 async function get_users(req, res) {
@@ -202,6 +203,37 @@ async function getDashboardData(req, res) {
             expenseHistory,
             settlements,
             financeProfile
+        });
+    } catch(error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
+}
+
+async function getUserProfile(req, res) {
+    try {
+        let user = await UserService.getUserProfile(req.params.id);
+        res.send({
+            status: true,
+            user
+        });
+    } catch(error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
+}
+
+async function updateUserProfile(req, res) {
+    try {
+        let user = await UserService.updateUserProfile(req.params.id, req.body);
+        res.send({
+            status: true,
+            message: 'Profile updated successfully',
+            user
         });
     } catch(error) {
         let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
