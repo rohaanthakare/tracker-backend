@@ -19,6 +19,7 @@ const UserSchema = new mongoose.Schema({
     firstName: String,
     middleName: String,
     lastName: String,
+    displayName: String,
     dateOfBirth: Date,
     gender:{
         type: mongoose.Schema.Types.ObjectId
