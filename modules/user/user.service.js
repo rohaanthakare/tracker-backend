@@ -246,7 +246,9 @@ async function getDailyStatus(user_id) {
 
 async function getUserProfile(user_id) {
     try {
-        let user = await User.findById(user_id);
+        let user = await User.findById(user_id).populate({
+            path: 'gender'
+        });
         return user;
     } catch (err) {
         throw err;
