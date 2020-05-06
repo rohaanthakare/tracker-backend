@@ -59,6 +59,7 @@ async function createContact(params, current_user) {
             revContactParams.user = contact.contact_user;
             revContactParams.contact_user = userInfo._id;
             revContactParams.revContact = contact._id;
+            revContactParams.isJointUser = contact.isJointUser;
             let revContact = await new Contact(revContactParams).save();
             await Contact.findByIdAndUpdate(contact._id, {
                 revContact: revContact._id
@@ -130,6 +131,10 @@ async function getUserSettlements(current_user) {
             }, {
                 settlementAmount: {
                     $ne: 0
+                }
+            }, {
+                isJointUser: {
+                    $eq: false
                 }
             }]
         }).populate({

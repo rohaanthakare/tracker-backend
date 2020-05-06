@@ -27,6 +27,8 @@ async function create_master_data(params) {
             params.parentConfig = parentMasterData[0]._id;
         }
         master_data = await new MasterData(params).save();
+    } else {
+        master_data = await MasterData.findByIdAndUpdate(master_data._id, params);
     }
     return master_data;
 } 
