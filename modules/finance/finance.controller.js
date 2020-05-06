@@ -9,7 +9,7 @@ module.exports = {
     createBranch, getBranches,
     getFinancialAccounts, createFinancialAccount, updateFinancialAccount, getFinancialAccountDetail, transferMoney,
     depositMoney, getUserTransactions, revertTransaction, addExpense, getContactTransactions,
-    createFinancialProfile, getFinancialProfile, updateFinancialProfile, addInvestment
+    createFinancialProfile, getFinancialProfile, updateFinancialProfile, addInvestment, getFinancialAccountsForUser
 }
 
 async function createBank(req, res) {
@@ -75,6 +75,18 @@ async function getBranches(req, res) {
 async function getFinancialAccounts(req, res) {
     try {
         let accounts = await FinanceService.getFinancialAccounts(req.current_user._id);
+        res.send(accounts);
+    } catch (error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
+}
+
+async function getFinancialAccountsForUser(req, res) {
+    try {
+        let accounts = await FinanceService.getFinancialAccounts(req.params.user_id);
         res.send(accounts);
     } catch (error) {
         let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];

@@ -36,7 +36,8 @@ const ContactSchema = new mongoose.Schema({
     settlementType: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'MasterData'
-    }
+    },
+    isJointUser: Boolean
 }, {
     versionKey: false,
     timestamps: {

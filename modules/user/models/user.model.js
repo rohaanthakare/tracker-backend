@@ -22,7 +22,8 @@ const UserSchema = new mongoose.Schema({
     displayName: String,
     dateOfBirth: Date,
     gender:{
-        type: mongoose.Schema.Types.ObjectId
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'MasterData'
     },
     status: {
         type: mongoose.Schema.Types.ObjectId,

@@ -326,7 +326,8 @@ async function getTotalSettlements(user_id) {
         const userId = HelperService.getMongoObjectId(user_id);
         let settlements = await Contact.aggregate([{
             $match: {
-                user: userId
+                user: userId,
+                isJointUser: false
             }
         }, { 
             '$lookup': { 

@@ -53,12 +53,14 @@ async function saveUser(params) {
         if(user.length > 0 && user[0].status.equals(invitedUserStatus._id)) {
             params.password = bcrypt.hashSync(params.password, 10);
             params.status = newUserStatus._id;
+            params.activation_otp = await HelperService.generate_otp();
             user = await User.findByIdAndUpdate(user[0]._id, {
                 status: newUserStatus._id,
                 username: params.username,
                 mobileNo: params.mobileNo,
                 password: params.password,
-                firstName: params.firstName
+                firstName: params.firstName,
+                activation_otp: params.activation_otp
             }, {
                 upsert: true,
                 new: true
@@ -246,7 +248,9 @@ async function getDailyStatus(user_id) {
 
 async function getUserProfile(user_id) {
     try {
-        let user = await User.findById(user_id);
+        let user = await User.findById(user_id).populate({
+            path: 'gender'
+        });
         return user;
     } catch (err) {
         throw err;
