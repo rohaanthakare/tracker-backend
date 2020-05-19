@@ -26,7 +26,11 @@ async function assign_permission(params) {
         role.permission.push(params.view_id);
         role = await Role.update({
             _id: role._id
-        }, role);
+        }, {
+            $addToSet: {
+                permission: [params.view_id]
+            }
+        });
         return role;
     }
 }

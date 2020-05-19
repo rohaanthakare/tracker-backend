@@ -5,7 +5,8 @@ module.exports = {
     getMongoObjectId,
     isEmpty,
     convertToTitleCase,
-    generate_otp
+    generate_otp,
+    getDisplayName
 }
 
 function getMongoObjectId(id) {
@@ -18,6 +19,19 @@ function isEmpty(input) {
     }
 
     return true;
+}
+
+function getDisplayName(user) {
+    let displayName = '';
+    if (user.firstName) {
+        displayName = convertToTitleCase(user.firstName);
+        if (user.lastName) {
+            displayName = displayName + convertToTitleCase(user.lastName);
+        }
+    } else {
+        displayName = convertToTitleCase(user.username);
+    }
+    return displayName;
 }
 
 function convertToTitleCase(inputStr) {

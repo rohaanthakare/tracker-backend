@@ -28,6 +28,16 @@ async function create_master_data(params) {
         }
         master_data = await new MasterData(params).save();
     } else {
+        if(params.parentConfig === '') {
+            delete params.parentConfig;
+        } else {
+            let search_query = {
+                search_key: 'configCode',
+                search_value: params.parentConfig 
+            };
+            let parentMasterData = await get_master_data_by(search_query);
+            params.parentConfig = parentMasterData[0]._id;
+        }
         master_data = await MasterData.findByIdAndUpdate(master_data._id, params);
     }
     return master_data;

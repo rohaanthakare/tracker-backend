@@ -2,7 +2,8 @@ const request = require('request');
 
 module.exports = {
     sendSMS,
-    sendActivationOtp
+    sendActivationOtp,
+    sendGroceryList
 }
 
 const TEXTLOCAL_BASE_URL = "https://api.textlocal.in/send/?"
@@ -12,6 +13,12 @@ const TEXTLOCAL_SENDER = "TXTLCL"
 function sendActivationOtp(user) {
     const smsBody = `Hi ${user.username}, OTP for activating your Tracker Account is ${user.activation_otp}`;
     return sendSMS(user.mobileNo, smsBody);
+}
+
+function sendGroceryList(params) {
+    const smsBody = `Hi ${params.name}, below is your grocery list.
+    ${params.list}`;
+    return sendSMS(params.mobileNo, smsBody);
 }
 
 function sendSMS(contact_number, sms_body){

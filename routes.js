@@ -6,6 +6,7 @@ const UserController = require('./modules/user/user.controller');
 const PasswordController = require('./modules/password/password.controller');
 const ContactController = require('./modules/contact/contact.controller');
 const FinanceController = require('./modules/finance/finance.controller');
+const GroceryController = require('./modules/grocery/grocery.controller');
 
 const router = express.Router();
 // Master data API's
@@ -68,6 +69,18 @@ router.get('/get_contact_transactions/:contact_id', FinanceController.getContact
 router.post('/create_financial_profile', FinanceController.createFinancialProfile);
 router.get('/get_financial_profile', FinanceController.getFinancialProfile);
 router.put('/update_financial_profile/:id', FinanceController.updateFinancialProfile);
+
+// Grocery Module API's
+router.get('/grocery_items', GroceryController.getGroceries);
+router.get('/grocery_item/:id', GroceryController.getItemDetails);
+router.post('/grocery_item', GroceryController.createGroceryItems);
+router.put('/grocery_item/:id', GroceryController.updateGroceryItem);
+router.delete('/grocery_item/:id', GroceryController.deleteGroceryItem);
+router.get('/out_of_stock_items', GroceryController.getMyGroceryList);
+router.get('/send_grocery_list', GroceryController.sendGroceriesList);
+router.put('/refill_grocery', GroceryController.refillGrocery);
+router.put('/consume_grocery', GroceryController.consumeGrocery);
+
 
 module.exports = router;
 module.exports.ROUTES_WIHTOUT_AUTH = ['/api/authenticate_user', '/api/register_user', '/api/activate_user', '/api/activate_by_otp',
