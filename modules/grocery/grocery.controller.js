@@ -5,7 +5,7 @@ const HelperService = require('../global/helper.service');
 
 module.exports = {
     getGroceries, createGroceryItems, updateGroceryItem, deleteGroceryItem, getItemDetails,
-    getMyGroceryList, makeItemOutOfStock, refillGrocery, sendGroceriesList
+    getMyGroceryList, makeItemOutOfStock, refillGrocery, sendGroceriesList, consumeGrocery
 }
 
 async function getGroceries(req, res) {
@@ -133,6 +133,22 @@ async function refillGrocery(req, res) {
         res.send({
             status: true,
             message: 'Grocery refilled successfully',
+            groceries
+        });
+    } catch (error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
+}
+
+async function consumeGrocery(req, res) {
+    try {
+        let groceries = await GroceryItem.consumeGrocery(req.body);
+        res.send({
+            status: true,
+            message: 'Grocery updated successfully',
             groceries
         });
     } catch (error) {

@@ -79,6 +79,7 @@ router.delete('/grocery_item/:id', GroceryController.deleteGroceryItem);
 router.get('/out_of_stock_items', GroceryController.getMyGroceryList);
 router.get('/send_grocery_list', GroceryController.sendGroceriesList);
 router.put('/refill_grocery', GroceryController.refillGrocery);
+router.put('/consume_grocery', GroceryController.consumeGrocery);
 
 
 module.exports = router;

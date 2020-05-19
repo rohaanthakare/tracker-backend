@@ -51,5 +51,21 @@ GroceryItemSchema.statics.refillGroceries = async function (itemIds) {
     }
 }
 
+GroceryItemSchema.statics.consumeGrocery = async function (itemIds) {
+    try {
+        let groceries = await GroceryItem.updateMany({
+            _id: {
+                $in: itemIds
+            }
+        }, {
+            isOutOfStock: true
+        });
+
+        return groceries;
+    } catch (error) {
+        throw error;
+    }
+}
+
 const GroceryItem = mongoose.model('GroceryItem', GroceryItemSchema);
 module.exports = GroceryItem;
