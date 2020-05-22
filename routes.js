@@ -80,6 +80,7 @@ router.get('/out_of_stock_items', GroceryController.getMyGroceryList);
 router.get('/send_grocery_list', GroceryController.sendGroceriesList);
 router.put('/refill_grocery', GroceryController.refillGrocery);
 router.put('/consume_grocery', GroceryController.consumeGrocery);
+router.get('/share_grocery_list/:id', GroceryController.sendGroceriesList);
 
 
 module.exports = router;

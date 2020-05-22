@@ -16,12 +16,18 @@ function sendActivationOtp(user) {
 }
 
 function sendGroceryList(params) {
-    const smsBody = `Hi ${params.name}, below is your grocery list.
-    ${params.list}`;
+    let smsBody;
+    if (params.otherUserName) {
+        smsBody = `Hi ${params.otherUserName}, ${params.name} has shared grocery list with you. Below is your grocery list.${params.list}`;
+    } else {
+        smsBody = `Hi ${params.name}, below is your grocery list.${params.list}`;
+    }
+    
     return sendSMS(params.mobileNo, smsBody);
 }
 
 function sendSMS(contact_number, sms_body){
+    console.log('Sending SMS to - ' + contact_number);
     const smsUrl = `${TEXTLOCAL_BASE_URL}apiKey=${TEXTLOCAL_API_SECRET}&sender=${TEXTLOCAL_SENDER}&numbers=91${contact_number}&message=${encodeURI(sms_body)}`;
     return new Promise(function (resolve, reject) {
         request(smsUrl, function (error, res, body) {
