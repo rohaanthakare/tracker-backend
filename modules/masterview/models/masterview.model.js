@@ -17,6 +17,7 @@ const MasterViewSchema = new mongoose.Schema({
     isMenu: Boolean,
     isToolbar: Boolean,
     iconClass: String,
+    mobileIconClass: String,
     displayOrder: Number,
     viewRoute: String
 }, {
