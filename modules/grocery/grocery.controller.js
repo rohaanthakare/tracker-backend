@@ -1,4 +1,5 @@
 const GroceryItem = require('./models/groceries.model');
+const Contact = require('../contact/models/contact.model');
 const GlobalEnum = require('../global/global.enumeration');
 const TrackerSMS = require('../global/trackersms.service');
 const HelperService = require('../global/helper.service');
@@ -162,16 +163,30 @@ async function consumeGrocery(req, res) {
 async function sendGroceriesList(req, res) {
     try {
         let itemsList = await GroceryItem.getOutOfStockGroceries(req.current_user._id);
-        let listString = '';
+        let listString = '%0a';
         for (let index = 0; index < itemsList.length; index++) {
             const itemNum = index + 1;
-            listString = listString + `${itemNum}. ${itemsList[index].name}%0a`; 
+            const itemName = HelperService.convertToTitleCase(itemsList[index].name);
+            listString = listString + `${itemNum}. ${itemName}%0a`; 
         }
         const displayName = HelperService.getDisplayName(req.current_user);
+        let mobile_number;
+        let messageText;
+        let other_user_name;
+        if (req.params.id) {
+            let contact = await Contact.findById(req.params.id);
+            mobile_number = contact.mobileNo;
+            other_user_name = HelperService.convertToTitleCase(contact.firstName) + ' ' + HelperService.convertToTitleCase(contact.lastName);
+            messageText = `Grocery list shared with your contact`;
+        } else {
+            mobile_number = req.current_user.mobileNo;
+            messageText = 'Grocery list sent to your registered mobile number';
+        }
         let params = {
             name: displayName,
             list: listString,
-            mobileNo: req.current_user.mobileNo
+            mobileNo: mobile_number,
+            otherUserName: other_user_name
         };
         await TrackerSMS.sendGroceryList(params);
         res.send({
