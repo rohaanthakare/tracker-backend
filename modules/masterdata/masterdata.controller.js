@@ -1,9 +1,12 @@
 const MasterDataService = require('./masterdata.service');
 const MasterDataDao = require('./masterdata.dao');
+const MasterData = require('./models/masterdata.model');
+const GlobalEnum = require('../global/global.enumeration');
 
 module.exports = {
     create_master_data,
-    getDataByParentConfig
+    getDataByParentConfig,
+    getAllMasterData
 }
 
 async function getDataByParentConfig(req, res) {
@@ -27,6 +30,20 @@ async function create_master_data(req, res) {
         res.send({
             status: true,
             master_data
+        });
+    }
+}
+
+async function getAllMasterData(req, res) {
+    try {
+        let masterdata = await MasterData.find().populate({
+            path: 'parentConfig'
+        });
+        res.send(masterdata);
+    } catch (error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
         });
     }
 }
