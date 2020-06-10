@@ -62,6 +62,8 @@ async function getFinancialAccounts(user_id) {
             user: user_id
         }).populate({
             path: 'bank'
+        }).populate({
+            path: 'accountType'
         }).sort({
             balance: -1
         });
