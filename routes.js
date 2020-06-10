@@ -12,6 +12,7 @@ const router = express.Router();
 // Master data API's
 router.post('/create_master_data', MasterDataController.create_master_data);
 router.get('/get_data_for_parent', MasterDataController.getDataByParentConfig);
+router.get('/get_master_data', MasterDataController.getAllMasterData);
 
 // Master View API's 
 router.post('/create_master_view', MasterViewController.create_view_config);
