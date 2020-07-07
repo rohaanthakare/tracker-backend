@@ -40,14 +40,6 @@ mongoose.connection.on('error', () => {
     console.log('Error while connecting to Database - ' + config.database);
 });
 
-// app.use('/mail-tester', function(req, res) {
-//     let response = TrackerMailer.sendTrackerMail();
-//     res.send({
-//         status: true,
-//         message: 'Email sending api'
-//     });
-// });
-
 app.use("/bank-logo", express.static(path.join(__dirname, 'public/bank_logos')));
 app.use("/mailImage", express.static(path.join(__dirname, 'public/images')));
 

@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    @import url(https://fonts.googleapis.com/css?family=Roboto:300); /*Calling our web font*/
+    body{
+        font-family: Roboto,"Helvetica Neue",sans-serif;
+        margin: 0px;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        
+        /* Extra small devices (phones, 600px and down) */
+        @media only screen and (max-width: 600px) {
+            .col-1 {width: 8.33%;}
+            .col-2 {width: 16.66%;}
+            .col-3 {width: 25%;}
+            .col-4 {width: 33.33%;}
+            .col-5 {width: 41.66%;}
+            .col-6 {width: 50%;}
+            .col-7 {width: 58.33%;}
+            .col-8 {width: 66.66%;}
+            .col-9 {width: 75%;}
+            .col-10 {width: 83.33%;}
+            .col-11 {width: 91.66%;}
+            .col-12 {width: 100%;}
+        }
+
+        /* Small devices (portrait tablets and large phones, 600px and up) */
+        @media only screen and (min-width: 600px) {
+            .col-sm-1 {width: 8.33%;}
+            .col-sm-2 {width: 16.66%;}
+            .col-sm-3 {width: 25%;}
+            .col-sm-4 {width: 33.33%;}
+            .col-sm-5 {width: 41.66%;}
+            .col-sm-6 {width: 50%;}
+            .col-sm-7 {width: 58.33%;}
+            .col-sm-8 {width: 66.66%;}
+            .col-sm-9 {width: 75%;}
+            .col-sm-10 {width: 83.33%;}
+            .col-sm-11 {width: 91.66%;}
+            .col-sm-12 {width: 100%;}
+        }
+
+        /* Medium devices (landscape tablets, 768px and up) */
+        @media only screen and (min-width: 768px) {
+            .col-md-1 {width: 8.33%;}
+            .col-md-2 {width: 16.66%;}
+            .col-md-3 {width: 25%;}
+            .col-md-4 {width: 33.33%;}
+            .col-md-5 {width: 41.66%;}
+            .col-md-6 {width: 50%;}
+            .col-md-7 {width: 58.33%;}
+            .col-md-8 {width: 66.66%;}
+            .col-md-9 {width: 75%;}
+            .col-md-10 {width: 83.33%;}
+            .col-md-11 {width: 91.66%;}
+            .col-md-12 {width: 100%;}
+        }
+
+        /* Large devices (laptops/desktops, 992px and up) */
+        @media only screen and (min-width: 992px) {
+            .col-lg-1 {width: 8.33%;}
+            .col-lg-2 {width: 16.66%;}
+            .col-lg-3 {width: 25%;}
+            .col-lg-4 {width: 33.33%;}
+            .col-lg-5 {width: 41.66%;}
+            .col-lg-6 {width: 50%;}
+            .col-lg-7 {width: 58.33%;}
+            .col-lg-8 {width: 66.66%;}
+            .col-lg-9 {width: 75%;}
+            .col-lg-10 {width: 83.33%;}
+            .col-lg-11 {width: 91.66%;}
+            .col-lg-12 {width: 100%;}
+        }
+
+        /* Extra large devices (large laptops and desktops, 1200px and up) */
+        @media only screen and (min-width: 1200px) {
+            .col-xl-1 {width: 8.33%;}
+            .col-xl-2 {width: 16.66%;}
+            .col-xl-3 {width: 25%;}
+            .col-xl-4 {width: 33.33%;}
+            .col-xl-5 {width: 41.66%;}
+            .col-xl-6 {width: 50%;}
+            .col-xl-7 {width: 58.33%;}
+            .col-xl-8 {width: 66.66%;}
+            .col-xl-9 {width: 75%;}
+            .col-xl-10 {width: 83.33%;}
+            .col-xl-11 {width: 91.66%;}
+            .col-xl-12 {width: 100%;}
+        }
+        
+        [class*="col-"] {
+            float: left;
+            padding: 15px;
+        }
+        
+        .row::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+        
+        .header-class{
+            background-color: #1c2541;
+            color: #FFFFFF;
+            padding: 20px 30px;
+            font-weight: bold;
+            font-size: 20pt;
+            margin-bottom: 20px;
+        }
+        .widget-class{
+            background-color: #3f51b5;
+            color: #FFFFFF;
+            padding: 15px;
+        }
+        .title-class{
+            font-size: 15pt;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .sub-title-class{
+            font-size: 11pt;
+        }
+        .trans_title{
+            font-size: 14pt;
+            padding-bottom: 20px;
+            color: #3f51b5;
+            font-weight: bold;
+        }
+        .trans_header{
+            font-weight: bold;
+            color: #474747;
+        }
+        .trans_header td{
+            border-bottom: 1px solid;
+            padding: 10px;
+        }
+        
+        .trans_details td{
+            border-bottom: 1px solid;
+            color: #474747;
+            padding: 10px;
+        }
+        
+        .header-class img {
+            width: 180px;
+            vertical-align: middle;
+        }
+        
+        .action-class {
+            text-decoration: none;
+            background-color: #5bc0be;
+            color: white !important;
+            padding: 15px 30px;
+            font-weight: bold;
+        }
+        .mail-container {
+            background-color: #EDEDED;
+            padding: 25px 0px;
+        }
+        .mail-content {
+            width: 80%;
+            margin: auto;
+            background-color: white;
+            padding-bottom: 50px;
+        }
+        
+        .message-class {
+            padding:15px;
+        }
+
+        .message-class p{
+            font-size:12pt;
+        }
+        
+        .footer-class {
+            font-size: 9pt;
+            text-align: center;
+            color: #575757;
+            padding-top: 20px !important;
+            margin-top: 20px !important;
+            border-top: 1px solid #CDCDCD;
+        }
+        
+        .footer-class a{
+            text-decoration: none;
+            color: #575757;
+        }
+    </style>
+</head>
+<body>
+    <div class="mail-container">
+        <div class="mail-content">
+            {{> header}}
+            {{{body}}}
+            {{> footer}}
+        </div>
+    </div>
+</body>
+</html>
