@@ -1,10 +1,15 @@
 <div class="row message-class">
     <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
         <p>Hi {{name}},</p>
-        <p>You are one step away from using Tracker, click below link to activate your Tracker account.</p>
+        <p>You are one step away from using Tracker, click below link to activate your Tracker account. Use below OTP for activating account.</p>
+        <h2>
+            <label style="background-color: #EDEDED; padding: 10px 25px;">
+                {{userOtp}}
+            </label>
+        </h2>
     </div>
 </div>
-<div class="row">
+<div class="row message-class">
     <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12" style="text-align: center">
         <a href="{{activationUrl}}" class="action-class">ACTIVATE</a>
     </div>

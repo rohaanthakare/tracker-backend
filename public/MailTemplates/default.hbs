@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <style>
-    @import url(https://fonts.googleapis.com/css?family=Roboto:300); /*Calling our web font*/
-    body{
-        font-family: Roboto,"Helvetica Neue",sans-serif;
-        margin: 0px;
+    <style>
+        @import url(https://fonts.googleapis.com/css?family=Roboto:300); /*Calling our web font*/
+        body{
+            font-family: Roboto,"Helvetica Neue",sans-serif;
+            margin: 0px;
         }
         * {
             box-sizing: border-box;
@@ -28,6 +28,26 @@
             .col-10 {width: 83.33%;}
             .col-11 {width: 91.66%;}
             .col-12 {width: 100%;}
+            
+            .mail-content {
+                width: 100%;
+                margin: auto;
+                background-color: white;
+                padding-bottom: 50px;
+            }
+
+            .header-class img {
+                width: 100%;
+                vertical-align: middle;
+            }
+            
+            .action-class {
+                text-decoration: none;
+                background-color: #5bc0be;
+                color: white !important;
+                padding: 10px 20px;
+                font-weight: bold;
+            }
         }
 
         /* Small devices (portrait tablets and large phones, 600px and up) */
@@ -44,9 +64,29 @@
             .col-sm-10 {width: 83.33%;}
             .col-sm-11 {width: 91.66%;}
             .col-sm-12 {width: 100%;}
+
+            .mail-content {
+                width: 100%;
+                margin: auto;
+                background-color: white;
+                padding-bottom: 50px;
+            }
+				
+            .header-class img {
+                width: 80%;
+                vertical-align: middle;
+            }
+				
+            .action-class {
+                text-decoration: none;
+                background-color: #5bc0be;
+                color: white !important;
+                padding: 15px 30px;
+                font-weight: bold;
+            }
         }
 
-        /* Medium devices (landscape tablets, 768px and up) */
+			/* Medium devices (landscape tablets, 768px and up) */
         @media only screen and (min-width: 768px) {
             .col-md-1 {width: 8.33%;}
             .col-md-2 {width: 16.66%;}
@@ -60,6 +100,26 @@
             .col-md-10 {width: 83.33%;}
             .col-md-11 {width: 91.66%;}
             .col-md-12 {width: 100%;}
+
+            .mail-content {
+                width: 90%;
+                margin: auto;
+                background-color: white;
+                padding-bottom: 50px;
+            }
+            
+            .header-class img {
+                width: 180px;
+                vertical-align: middle;
+            }
+            
+            .action-class {
+                text-decoration: none;
+                background-color: #5bc0be;
+                color: white !important;
+                padding: 15px 30px;
+                font-weight: bold;
+            }
         }
 
         /* Large devices (laptops/desktops, 992px and up) */
@@ -76,6 +136,26 @@
             .col-lg-10 {width: 83.33%;}
             .col-lg-11 {width: 91.66%;}
             .col-lg-12 {width: 100%;}
+
+            .mail-content {
+                width: 80%;
+                margin: auto;
+                background-color: white;
+                padding-bottom: 50px;
+            }
+            
+            .header-class img {
+                width: 180px;
+                vertical-align: middle;
+            }
+            
+            .action-class {
+                text-decoration: none;
+                background-color: #5bc0be;
+                color: white !important;
+                padding: 15px 30px;
+                font-weight: bold;
+            }
         }
 
         /* Extra large devices (large laptops and desktops, 1200px and up) */
@@ -92,26 +172,45 @@
             .col-xl-10 {width: 83.33%;}
             .col-xl-11 {width: 91.66%;}
             .col-xl-12 {width: 100%;}
+				
+            .mail-content {
+                width: 80%;
+                margin: auto;
+                background-color: white;
+                padding-bottom: 50px;
+            }
+            
+            .header-class img {
+                width: 180px;
+                vertical-align: middle;
+            }
+            
+            .action-class {
+                text-decoration: none;
+                background-color: #5bc0be;
+                color: white !important;
+                padding: 15px 30px;
+                font-weight: bold;
+            }
         }
-        
+
         [class*="col-"] {
             float: left;
             padding: 15px;
         }
-        
+
         .row::after {
             content: "";
             clear: both;
             display: table;
         }
-        
+
         .header-class{
             background-color: #1c2541;
             color: #FFFFFF;
             padding: 20px 30px;
             font-weight: bold;
-            font-size: 20pt;
-            margin-bottom: 20px;
+            font-size: 17pt;
         }
         .widget-class{
             background-color: #3f51b5;
@@ -140,56 +239,73 @@
             border-bottom: 1px solid;
             padding: 10px;
         }
-        
+
         .trans_details td{
             border-bottom: 1px solid;
             color: #474747;
             padding: 10px;
         }
-        
-        .header-class img {
-            width: 180px;
-            vertical-align: middle;
-        }
-        
-        .action-class {
-            text-decoration: none;
-            background-color: #5bc0be;
-            color: white !important;
-            padding: 15px 30px;
-            font-weight: bold;
-        }
+
         .mail-container {
             background-color: #EDEDED;
             padding: 25px 0px;
         }
-        .mail-content {
-            width: 80%;
-            margin: auto;
-            background-color: white;
-            padding-bottom: 50px;
-        }
-        
+
         .message-class {
             padding:15px;
         }
 
-        .message-class p{
-            font-size:12pt;
-        }
-        
         .footer-class {
             font-size: 9pt;
             text-align: center;
             color: #575757;
-            padding-top: 20px !important;
-            margin-top: 20px !important;
+            padding-top: 20px;
+            margin-top: 20px;
             border-top: 1px solid #CDCDCD;
         }
         
         .footer-class a{
             text-decoration: none;
             color: #575757;
+        }
+
+        .module-class img{
+            width: 36px;
+        }
+        
+        .module-title {
+            font-weight: bold;
+            font-size: 15pt;
+        }
+        
+        .module-div {
+            width: 85%;
+            margin: auto;
+            background-color: #5bc0be;
+            margin-bottom: 10px;
+        }
+        
+        .module-icon {
+            background-color: rgba(28,37,65, 0.3);
+            padding: 15px;
+            margin: 15px;
+            border-radius: 15px;
+        }
+			
+        .module-details {
+            padding: 0px 25px;
+            color: #1c2541;
+        }
+        
+        .module-details p{
+            margin: 0px;
+        }
+        
+        .title-text {
+            text-align: center;
+            font-size: 15pt;
+            font-weight: bold;
+            color: #676767;
         }
     </style>
 </head>
