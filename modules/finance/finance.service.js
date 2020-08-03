@@ -9,6 +9,7 @@ const FinanceDao = require('./finance.dao');
 const MasterDataDao = require('../masterdata/masterdata.dao');
 const HelperService = require('../global/helper.service');
 const moment = require('moment');
+const _ = require('lodash');
 
 module.exports = {
     createBank, getBanks,
@@ -261,6 +262,7 @@ async function getExpenseHistory(user_id) {
                 }
             }
         }]);
+        expenseHistory = _.sortBy(expenseHistory, ['_id.month']);        
         return expenseHistory;
     } catch (err) {
         throw err;
