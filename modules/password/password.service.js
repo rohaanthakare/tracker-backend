@@ -1,4 +1,7 @@
 const Password = require('./models/password.model');
+const Cryptr = require('cryptr');
+const GlobalConfig = require('../../configs/global.config');
+const TrackerCryptr = new Cryptr(GlobalConfig.token_secret);
 
 module.exports = {
     getPasswords,
@@ -27,12 +30,14 @@ async function getPasswords(params, current_user) {
 
 async function createPassword(params, current_user) {
     params.user = current_user._id;
+    params.password = TrackerCryptr.encrypt(params.password);
     let password = Password.createPassword(params);
     return password;
 }
 
 async function getPasswordDetail(id) {
     let password = await Password.findById(id);
+    password.password = TrackerCryptr.decrypt(password.password);
     return password;
 }
 
