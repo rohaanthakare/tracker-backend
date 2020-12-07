@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer');
-const sgTransport = require('nodemailer-sendgrid-transport');
+const sesTransport = require('nodemailer-ses-transport');
 const HelperService = require('../global/helper.service');
 const GlobalConfig = require('../../configs/global.config');
 const path = require('path');
@@ -11,10 +11,10 @@ const User = require('../user/models/user.model');
 const { env } = require('process');
 const imgsrc = base64img.base64Sync('./public/images/tracker-light.png');
 
-let transporter = nodemailer.createTransport(sgTransport({
-    auth: {
-        api_key: process.env.SENDGRID_API_KEY
-    }
+let transporter = nodemailer.createTransport(sesTransport({
+    "accessKeyId": process.env.SES_ACCESS_KEY_ID,
+    "secretAccessKey": process.env.SES_SECRET_ACCESS_KEY,
+    "region": process.env.SES_REGION
 }));
 
 transporter.use('compile', hbs({
