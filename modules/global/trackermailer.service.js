@@ -40,27 +40,7 @@ module.exports = {
 }
 
 async function testMailTemplate(req, res) {
-    let user = await User.findOne({
-        username: 'demo'
-    });
-    user.emailId = 'rohaanthakare@gmail.com';
-    switch(req.body.name) {
-        case 'ACTIVATION_MAIL': 
-            await sendActivationMail(user);
-        break;
-
-        case 'INVITATION_MAIL':
-            await sendTrackerInviteMail(user);
-        break;
-
-        case 'RESET_PASSWORD_MAIL':
-            await sendResetPassLinkMail(user);
-        break;
-    }
-    res.send({
-        status: true,
-        message: 'Template mail sent'
-    });
+    
 }
 
 async function sendWelcomeMail(userInfo) {
@@ -90,29 +70,33 @@ async function sendWelcomeMail(userInfo) {
 }
 
 async function sendDailyStatusMail(mailParams) {
-    let template = new EmailTemplates();
-    template.render('../public/mail_templates/daily_status_mail/daily_status_mail.pug', {
-        name: mailParams.name,
-        mailDate: mailParams.mailDate,
-        balance: mailParams.balance,
-        expense: mailParams.expense,
-        moneyToTake: mailParams.moneyToTake,
-        moneyToGive: mailParams.moneyToGive,
-        transactions: mailParams.transactions
-    }).then( async (mailMessage) => {
-        let mailOptions = {
-            from: 'Tracker <trackermaster1912@gmail.com>',
-            to: mailParams.emailId,
-            subject: `Tracker Statement for ${mailParams.mailDate}`,
-            html: mailMessage
-        };
+    let mailOptions = {
+        from: 'Tracker <trackermaster1912@gmail.com>',
+        to: mailParams.emailId,
+        subject: `Tracker Statement for ${mailParams.mailDate}`,
+        template: 'daily-status',
+        attachments: [{
+            filename: 'Tracker.png',
+            content: imgsrc.split("base64,")[1],
+            encoding: 'base64',
+            cid: 'tracker-logo'
+        }],
+        context: {
+            name: mailParams.name,
+            mailDate: mailParams.mailDate,
+            balance: mailParams.balance,
+            expense: mailParams.expense,
+            moneyToTake: mailParams.moneyToTake,
+            moneyToGive: mailParams.moneyToGive,
+            transactions: mailParams.transactions
+        }
+    };
     
-        return await transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                return console.log(error);
-            }
-            console.log('Status Mail sent to : ' + mailParams.emailId);
-        });
+    return await transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            return console.log(error);
+        }
+        console.log('Message %s sent: %s', info.messageId, info.response);
     });
 
 }

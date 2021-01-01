@@ -7,7 +7,7 @@ const PasswordController = require('./modules/password/password.controller');
 const ContactController = require('./modules/contact/contact.controller');
 const FinanceController = require('./modules/finance/finance.controller');
 const GroceryController = require('./modules/grocery/grocery.controller');
-const MailerService = require('./modules/global/trackermailer.service');
+const MailerController = require('./modules/global/trackermailer.controller');
 
 const router = express.Router();
 // Master data API's
@@ -37,7 +37,7 @@ router.put('/reset_password', UserController.resetPassword);
 router.get('/get_dashboard_data', UserController.getDashboardData);
 router.get('/user_profile/:id', UserController.getUserProfile);
 router.put('/user_profile/:id', UserController.updateUserProfile);
-router.post('/test_mail_template', MailerService.testMailTemplate);
+router.post('/test_mail_template', MailerController.testMailTemplate);
 
 // Password Module API's
 router.get('/get_passwords', PasswordController.getPasswords);

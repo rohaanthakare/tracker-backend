@@ -1,0 +1,57 @@
+<div class="row message-class" style="padding-bottom: 0px;">
+    <p>
+        Hi {{name}},
+    </p>
+    <p style="margin: 0px;">
+        Below is your tracker status on {{mailDate}}.
+    </p>
+</div>
+<div class="row message-class" style="padding-bottom: 5px;">
+    <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3" style="float: left; padding: 10px">
+        <div class="widget-class">
+            <div class="title-class">Rs. {{balance}}</div>
+            <div class="sub-title-class">BALANCE</div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3" style="float: left; padding: 10px">
+        <div class="widget-class">
+            <div class="title-class">Rs. {{expense}}</div>
+            <div class="sub-title-class">EXPENSE</div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3" style="float: left; padding: 10px">
+        <div class="widget-class">
+            <div class="title-class">Rs. {{moneyToGive}}</div>
+            <div class="sub-title-class">MONEY TO GIVE</div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-md-6 col-lg-3 col-xl-3" style="float: left; padding: 10px">
+        <div class="widget-class">
+            <div class="title-class">Rs. {{moneyToTake}}</div>
+            <div class="sub-title-class">MONEY TO TAKE</div>
+        </div>
+    </div>	
+</div>
+<div class="row message-class" style="padding-top: 0px;">
+    <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+        <div class="trans_title">Transactions</div>
+        <table class="trans-table">
+            <tr class="trans_header">
+                <td>Details</td>
+                <td>Amount</td>
+            </tr>
+            {{#if transactions}}
+                {{#each transactions}}
+                    <tr class="trans_details">
+                        <td>{{this.transactionCategory}} - {{this.transactionSubCategory}} - {{this.transactionDetail}}</td>
+                        <td>Rs. {{this.transactionAmount}}</td>
+                    </tr>
+                {{/each}}
+            {{else}}
+                <tr class="trans_details">
+                    <td colspan="2">No transaction done today.</td>
+                </tr>
+            {{/if}}
+        </table>
+    </div>
+</div>
