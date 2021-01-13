@@ -40,7 +40,7 @@ mongoose.connection.on('error', () => {
     console.log('Error while connecting to Database - ' + config.database);
 });
 
-app.use("/bank-logo", express.static(path.join(__dirname, 'public/bank_logos')));
+app.use("/api/bank-logo", express.static(path.join(__dirname, 'public/bank_logos')));
 app.use("/mailImage", express.static(path.join(__dirname, 'public/images')));
 
 app.use(function (req, res, next) {  

@@ -43,6 +43,7 @@ async function getPasswordDetail(id) {
 
 async function updatePassword(id, params) {
     try {
+        params.password = TrackerCryptr.encrypt(params.password);
         let password = await Password.findByIdAndUpdate(id, params);
         return password;
     } catch (error) {
