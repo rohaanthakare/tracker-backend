@@ -1,6 +1,6 @@
 const User = require('./models/user.model');
 const Role = require('../role/models/role.model');
-
+const MasterDataDao = require('../masterdata/masterdata.dao');
 module.exports = {
     getUserBy,
     getUsersByRole
@@ -22,8 +22,11 @@ async function getUsersByRole(roleCd) {
             roleCode: roleCd
         });
 
+        let activeUserStatus = await MasterDataDao.getDataByParentAndConfig('USER_STATUS', 'ACTIVE');
+
         let users = await User.find({
-            role: role._id
+            role: role._id,
+            status: activeUserStatus._id
         });
 
         return users;
