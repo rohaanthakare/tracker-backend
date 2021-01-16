@@ -1,0 +1,23 @@
+<div class="row message-class" style="padding-bottom: 0px;">
+    <p>
+        Hi {{name}},
+    </p>
+    <p style="margin: 0px;">
+        Below is your grocery list.
+    </p>
+</div>
+<div class="row message-class" style="overflow: hidden;">
+    {{#if grocery_items}}
+        {{#each grocery_items}}
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3" style="float: left; padding: 10px">
+                <div class="widget-class">
+                    <div class="sub-title-class">{{this.srNo}}. {{this.name}}</div>
+                </div>
+            </div>
+        {{/each}}
+    {{else}}
+        <div>
+            No out of stock grocery item.
+        </div>
+    {{/if}}	
+</div>
