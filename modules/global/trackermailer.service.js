@@ -36,6 +36,7 @@ module.exports = {
     sendWelcomeMail,
     sendDailyStatusMail,
     getWelcomeMailMessage,
+    sendGroceryListMail,
     testMailTemplate
 }
 
@@ -228,6 +229,33 @@ async function sendTrackerInviteMail(userInfo) {
         }
         console.log('Message %s sent: %s', info.messageId, info.response);
     });
+}
+
+async function sendGroceryListMail(mailParams) {
+    let mailOptions = {
+        from: 'Tracker <trackermaster1912@gmail.com>',
+        to: mailParams.emailId,
+        subject: `Tracker grocery list`,
+        template: 'grocery-list',
+        attachments: [{
+            filename: 'Tracker.png',
+            content: imgsrc.split("base64,")[1],
+            encoding: 'base64',
+            cid: 'tracker-logo'
+        }],
+        context: {
+            name: mailParams.name,
+            grocery_items: mailParams.groceryItems
+        }
+    };
+    
+    return await transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            return console.log(error);
+        }
+        console.log('Message %s sent: %s', info.messageId, info.response);
+    });
+
 }
 
 function getWelcomeMailMessage(params) {    

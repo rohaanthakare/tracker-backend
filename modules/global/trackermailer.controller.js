@@ -1,5 +1,6 @@
 const User = require('../user/models/user.model');
 const UserService = require('../user/user.service');
+const GroceryService = require('../grocery/grocery.service');
 const TrackerMailer = require('./trackermailer.service');
 const GlobalEnum = require('./global.enumeration');
 const moment = require('moment');
@@ -62,9 +63,22 @@ async function testMailTemplate(req, res) {
                     mailParam.transactions.push(newTrans);
                 }
                 mailParam.emailId = 'rohaanthakare@gmail.com';
-                console.log('----------Daily Status Mail Param--------');
-                console.log(mailParam);
                 await TrackerMailer.sendDailyStatusMail(mailParam);
+            break;
+
+            case 'GROCERY_LIST_MAIL':
+                let groceries = await GroceryService.getOutOfStockItems(user._id);
+                let mailParams = {};
+                mailParams.name = HelperService.getDisplayName(user);
+                mailParams.emailId = 'rohaanthakare@gmail.com';
+                mailParams.groceryItems = []
+                for (let index = 0; index < groceries.length; index++) {
+                    const newItem = {};
+                    newItem.srNo = index + 1;
+                    newItem.name = groceries[index].name;
+                    mailParams.groceryItems.push(newItem);
+                }
+                await TrackerMailer.sendGroceryListMail(mailParams);
             break;
         }
         res.send({
@@ -72,8 +86,6 @@ async function testMailTemplate(req, res) {
             message: 'Template mail sent'
         });
     } catch (error) {
-        console.log('---------testMailtemplate---------');
-        console.log(error);
         let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
         res.status(500).send({
             message: errorMsg

@@ -2,10 +2,10 @@ const UserService = require('./user.service');
 const RoleService = require('../role/role.service');
 const TrackerMailer = require('../global/trackermailer.service');
 const User = require('./models/user.model');
-const GroceryItem = require('../grocery/models/groceries.model');
 const bcrypt = require('bcryptjs');
 const GlobalEnum = require('../global/global.enumeration');
 const FinanceService = require('../finance/finance.service');
+const GroceryService = require('../grocery/grocery.service');
 const HelperService = require('../global/helper.service');
 
 module.exports = {
@@ -196,10 +196,7 @@ async function getDashboardData(req, res) {
         let expenseHistory = await FinanceService.getExpenseHistory(req.current_user._id);
         let settlements = await FinanceService.getTotalSettlements(req.current_user._id);
         let financeProfile = await FinanceService.getFinancialProfile(req.current_user._id);
-        let totalOutOfStockItems = await GroceryItem.find({
-            user: req.current_user._id,
-            isOutOfStock: true
-        }).count();
+        let totalOutOfStockItems = await GroceryService.getOutOfStockItemsCount(req.current_user._id)
         res.send({
             status: true,
             message: 'Dashboard data fetched successfully',

@@ -1,7 +1,7 @@
 const GroceryItem = require('./models/groceries.model');
 const Contact = require('../contact/models/contact.model');
 const GlobalEnum = require('../global/global.enumeration');
-const TrackerSMS = require('../global/trackersms.service');
+const TrackerMailer = require('../global/trackermailer.service');
 const HelperService = require('../global/helper.service');
 
 module.exports = {
@@ -164,31 +164,40 @@ async function sendGroceriesList(req, res) {
     try {
         let itemsList = await GroceryItem.getOutOfStockGroceries(req.current_user._id);
         let listString = '%0a';
+        const mailParams = {};
+        const groceryItems = [];
         for (let index = 0; index < itemsList.length; index++) {
             const itemNum = index + 1;
             const itemName = HelperService.convertToTitleCase(itemsList[index].name);
-            listString = listString + `${itemNum}. ${itemName}%0a`; 
+            listString = listString + `${itemNum}. ${itemName}%0a`;
+            const newItem = {};
+            newItem.srNo = index + 1;
+            newItem.name = itemName;
+            groceryItems.push(newItem);
         }
         const displayName = HelperService.getDisplayName(req.current_user);
-        let mobile_number;
-        let messageText;
-        let other_user_name;
-        if (req.params.id) {
-            let contact = await Contact.findById(req.params.id);
-            mobile_number = contact.mobileNo;
-            other_user_name = HelperService.convertToTitleCase(contact.firstName) + ' ' + HelperService.convertToTitleCase(contact.lastName);
-            messageText = `Grocery list shared with your contact`;
-        } else {
-            mobile_number = req.current_user.mobileNo;
-            messageText = 'Grocery list sent to your registered mobile number';
-        }
-        let params = {
-            name: displayName,
-            list: listString,
-            mobileNo: mobile_number,
-            otherUserName: other_user_name
-        };
-        await TrackerSMS.sendGroceryList(params);
+        mailParams.name = displayName;
+        mailParams.emailId = req.current_user.emailId;
+        mailParams.groceryItems = groceryItems;
+        // let mobile_number;
+        // let messageText;
+        // let other_user_name;
+        // if (req.params.id) {
+        //     let contact = await Contact.findById(req.params.id);
+        //     mobile_number = contact.mobileNo;
+        //     other_user_name = HelperService.convertToTitleCase(contact.firstName) + ' ' + HelperService.convertToTitleCase(contact.lastName);
+        //     messageText = `Grocery list shared with your contact`;
+        // } else {
+        //     mobile_number = req.current_user.mobileNo;
+        //     messageText = 'Grocery list sent to your registered mobile number';
+        // }
+        // let params = {
+        //     name: displayName,
+        //     list: listString,
+        //     mobileNo: mobile_number,
+        //     otherUserName: other_user_name
+        // };
+        await TrackerMailer.sendGroceryListMail(mailParams);
         res.send({
             status: true,
             message: 'Grocery list sent to your registered mobile number.'
