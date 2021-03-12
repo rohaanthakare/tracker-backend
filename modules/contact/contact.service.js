@@ -43,6 +43,7 @@ async function createContact(params, current_user) {
                 newUserDetial.password = 'invited';
                 newUserDetial.username = 'invited' + new Date().getTime();
                 newUserDetial.role = 'TRACKER_USER';
+                newUserDetial.invitedBy = HelperService.getDisplayName(current_user);
                 let newUser = await UserService.saveUser(newUserDetial);
                 params.contact_user = newUser.user._id;
             }
