@@ -188,6 +188,11 @@ async function sendResetPassLinkMail(userInfo) {
 }
 
 async function sendTrackerInviteMail(userInfo) {
+    userInfo.displayName = HelperService.getDisplayName(userInfo);
+    userInfo.isWebApp = true;
+    if (userInfo.isWebApp) {
+        userInfo.startLink = 'http://ec2-13-233-227-235.ap-south-1.compute.amazonaws.com/#/';
+    }
     const finimgsrc = base64img.base64Sync('./public/images/finance.png');
     const contactimgsrc = base64img.base64Sync('./public/images/contact.png');
     const groceryimgsrc = base64img.base64Sync('./public/images/grocery.png');
@@ -216,11 +221,12 @@ async function sendTrackerInviteMail(userInfo) {
             encoding: 'base64',
             cid: 'grocery-icon'
         }],
-        template: 'user-invite'//,
-        // context: {
-        //     name: mailParams.displayName,
-        //     activationUrl: mailParams.activationLink
-        // }
+        template: 'user-invite',
+        context: {
+            userDisplayName: userInfo.displayName,
+            invitedByName: userInfo.invitedBy,
+            linkText: 'GET STARTEDDDD'
+        }
     };
     
     return await transporter.sendMail(mailOptions, (error, info) => {
