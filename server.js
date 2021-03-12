@@ -49,7 +49,7 @@ app.use(function (req, res, next) {
         next();
     } else {
         let token = req.headers['authorization'];
-        if (token.startsWith('Bearer ')) {
+        if (token && token.startsWith('Bearer ')) {
             token = token.slice(7, token.length);
         }
 
@@ -67,7 +67,7 @@ app.use(function (req, res, next) {
             });
             app.use('/api', routes);
         } else {
-            return res.json({
+            return res.status(401).json({
                 status: false,
                 message: 'Auth token in not supplied'
             });
