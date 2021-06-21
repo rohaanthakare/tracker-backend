@@ -72,6 +72,11 @@ router.get('/get_contact_transactions/:contact_id', FinanceController.getContact
 router.post('/create_financial_profile', FinanceController.createFinancialProfile);
 router.get('/get_financial_profile', FinanceController.getFinancialProfile);
 router.put('/update_financial_profile/:id', FinanceController.updateFinancialProfile);
+router.post('/start_new_investment', FinanceController.startNewInvestment);
+router.get('/get_user_investments', FinanceController.getUserInvestments);
+router.post('/invest_money', FinanceController.investMoney);
+router.post('/close_investment', FinanceController.closeInvestment);
+router.get('/get_investment_transaction/:id', FinanceController.getInvestmentTransactions);
 
 // Grocery Module API's
 router.get('/grocery_items', GroceryController.getGroceries);

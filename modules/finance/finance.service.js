@@ -5,6 +5,8 @@ const UserTransaction = require('./models/usertransaction.model');
 const ContactTransaction = require('./models/contacttransaction.model');
 const Contact = require('../contact/models/contact.model');
 const FinancialProfile = require('./models/financial-profile.model');
+const Investment = require('./models/investment.model');
+const InvestmentTransaction = require('./models/investment-transaction.model');
 const FinanceDao = require('./finance.dao');
 const MasterDataDao = require('../masterdata/masterdata.dao');
 const HelperService = require('../global/helper.service');
@@ -17,7 +19,7 @@ module.exports = {
     getFinancialAccounts, createFinancialAccount, updateFinancialAccount, getFinancialAccountDetail,
     getUserTransctions, getContactTransactions, getMonthlyExpenseSplit, getExpenseHistory,
     createFinanceProfile, getFinancialProfile, updateFinancialProfile, getTotalSettlements, getTotalBalance, getTotalMonthlyExpense,
-    getTodaysTransactions
+    getTodaysTransactions, startNewInvestment, getUserInvestments, investMoney, closeInvestment, getInvestmentTransactions
 }
 
 async function createBank(params) {
@@ -471,6 +473,85 @@ async function getTodaysTransactions(user_id) {
         });
 
         return trans;
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function startNewInvestment(params) {
+    try {
+        let investment = await new Investment(params).save();
+        return investment;
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function getUserInvestments(user_id) {
+    try {
+        let investments = await Investment.find({
+            user: user_id
+        }).populate('investmentType');
+        return investments;
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function investMoney(params, current_user) {
+    try {
+        // Update investment balance
+        let transactionType = await MasterDataDao.getDataByParentAndConfig('INV_TRANS_TYPE', 'INVEST_MONEY');
+        let investment = await Investment.findById(params.investmentDetail._id);
+        let investmentTransParams = {
+            investment: investment._id,
+            transactionAmount: params.transactionAmount,
+            transactionDate: params.transactionDate,
+            description: params.transactionDetail,
+            transactionType: transactionType._id 
+        };
+        let invTrans = await new InvestmentTransaction(investmentTransParams).save();
+        let newInvestmentAmount = investment.investmentAmount + params.transactionAmount;
+        investment = await Investment.findByIdAndUpdate(investment._id, {
+            investmentAmount: newInvestmentAmount
+        }); 
+        return investment;
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function closeInvestment(params, current_user) {
+    try {
+        // Update investment balance
+        let transactionType = await MasterDataDao.getDataByParentAndConfig('INV_TRANS_TYPE', 'CLOSE_INVESTMENT');
+        let investment = await Investment.findById(params.investmentDetail._id);
+        let investmentTransParams = {
+            investment: investment._id,
+            transactionAmount: params.transactionAmount,
+            transactionDate: params.transactionDate,
+            description: params.transactionDetail,
+            transactionType: transactionType._id 
+        };
+        let invTrans = await new InvestmentTransaction(investmentTransParams).save();
+        investment = await Investment.findByIdAndUpdate(investment._id, {
+            maturityAmount: params.transactionAmount
+        }); 
+        return investment;
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function getInvestmentTransactions(investmentId) {
+    try {
+        // Update investment balance
+        let investmentTrans = await InvestmentTransaction.find({
+            investment: investmentId
+        }).populate({
+            path: 'transactionType'
+        });
+        return investmentTrans;
     } catch (error) {
         throw error;
     }
