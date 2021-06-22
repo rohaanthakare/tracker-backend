@@ -19,7 +19,8 @@ module.exports = {
     getFinancialAccounts, createFinancialAccount, updateFinancialAccount, getFinancialAccountDetail,
     getUserTransctions, getContactTransactions, getMonthlyExpenseSplit, getExpenseHistory,
     createFinanceProfile, getFinancialProfile, updateFinancialProfile, getTotalSettlements, getTotalBalance, getTotalMonthlyExpense,
-    getTodaysTransactions, startNewInvestment, getUserInvestments, investMoney, closeInvestment, getInvestmentTransactions
+    getTodaysTransactions, startNewInvestment, getUserInvestments, investMoney, closeInvestment, getInvestmentTransactions,
+    getTotalInvestment
 }
 
 async function createBank(params) {
@@ -244,12 +245,18 @@ async function getExpenseHistory(user_id) {
         let expenseConfig = await MasterDataDao.getDataByCode('EXPENSE');
         const expenseId = HelperService.getMongoObjectId(expenseConfig._id);
         const userId = HelperService.getMongoObjectId(user_id);
+        const currentDate = new Date();
+        currentDate.setMonth(currentDate.getMonth() - 5);
+        const prevDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
         let expenseHistory = await UserTransaction.aggregate([{
             $match: {
                 user: userId,
                 transactionCategory: expenseId,
                 isReverted: {
                     $exists: false
+                },
+                transactionDate: {
+                    $gt: prevDate
                 }
             }
         },
@@ -535,7 +542,8 @@ async function closeInvestment(params, current_user) {
         };
         let invTrans = await new InvestmentTransaction(investmentTransParams).save();
         investment = await Investment.findByIdAndUpdate(investment._id, {
-            maturityAmount: params.transactionAmount
+            maturityAmount: params.transactionAmount,
+            isActive: false
         }); 
         return investment;
     } catch (error) {
@@ -552,6 +560,34 @@ async function getInvestmentTransactions(investmentId) {
             path: 'transactionType'
         });
         return investmentTrans;
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function getTotalInvestment(userId) {
+    try {
+        const user_id = HelperService.getMongoObjectId(userId);
+        let totalInvestment = await Investment.aggregate([{
+            $match: {
+                user: user_id,
+                isActive: true
+            }
+        }, {
+            $group: {
+                _id: '$user',
+                total: {
+                    '$sum': '$investmentAmount'
+                }
+            }
+        }]);
+        let total;
+        if (totalInvestment.length > 0) {
+            total = totalInvestment[0].total;
+        } else {
+            total = 0;
+        }
+        return total;
     } catch (error) {
         throw error;
     }
