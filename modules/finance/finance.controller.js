@@ -9,7 +9,8 @@ module.exports = {
     createBranch, getBranches,
     getFinancialAccounts, createFinancialAccount, updateFinancialAccount, getFinancialAccountDetail, transferMoney,
     depositMoney, getUserTransactions, revertTransaction, addExpense, getContactTransactions,
-    createFinancialProfile, getFinancialProfile, updateFinancialProfile, addInvestment, getFinancialAccountsForUser
+    createFinancialProfile, getFinancialProfile, updateFinancialProfile, addInvestment, getFinancialAccountsForUser,
+    startNewInvestment, getUserInvestments, investMoney, getInvestmentTransactions, closeInvestment
 }
 
 async function createBank(req, res) {
@@ -325,6 +326,114 @@ async function updateFinancialProfile(req, res) {
             status: true,
             message:'Financial Profile updated successfully',
             account});
+    } catch (error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
+}
+
+async function startNewInvestment(req, res) {
+    try {
+        let params = req.body;
+        params.investmentType = params.investmentType._id;
+        params.user = req.current_user._id;
+        params.investmentAmount = 0;
+        params.isActive = true;
+        let investment = await FinanceService.startNewInvestment(params);
+        res.send({
+            status: true,
+            message: 'Investment started successfully',
+            investment
+        });
+    } catch (error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
+}
+
+async function getUserInvestments(req, res) {
+    try {
+        let investments = await FinanceService.getUserInvestments(req.current_user._id);
+        res.send({
+            status: true,
+            message: 'Investments list fetched successfully',
+            investments
+        });
+    } catch (error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
+}
+
+async function investMoney(req, res) {
+    try {
+        let investmentTransaction = null;
+        let debitTrnsaction = await MasterDataDao.getDataByParentAndConfig('TRANS_TYPE', 'DEBIT');
+        let transactionCategory = await MasterDataDao.getDataByParentAndConfig('TRANS_CATEGORY', 'INVESTMENT');
+        let params = req.body;
+        params.transactionCategory = HelperService.getMongoObjectId(transactionCategory._id);
+        params.transactionSubCategory = params.investmentDetail.investmentType._id;
+        params.user = req.current_user._id;
+        params.account = (params.account) ? params.account._id : null;
+        params.transactionType = debitTrnsaction._id;
+        let transaction = await FinanceWorkflow.createNewTransaction(params, req.current_user);
+        if (transaction) {
+            investmentTransaction = await FinanceService.investMoney(params, req.current_user); 
+        }
+        res.send({
+            status: true,
+            message: 'Money invested successfully, please check account balance',
+            investmentTransaction
+        });
+    } catch (error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
+}
+
+async function getInvestmentTransactions(req, res) {
+    try {
+        let investmentTrans = await FinanceService.getInvestmentTransactions(req.params.id);
+        res.send({
+            status: true,
+            investmentTrans
+        });
+    } catch (error) {
+        let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
+        res.status(500).send({
+            message: errorMsg
+        });
+    }
+}
+
+async function closeInvestment(req, res) {
+    try {
+        let investmentTransaction = null;
+        let creditTrnsaction = await MasterDataDao.getDataByParentAndConfig('TRANS_TYPE', 'CREDIT');
+        let transactionCategory = await MasterDataDao.getDataByParentAndConfig('TRANS_CATEGORY', 'INVESTMENT');
+        let params = req.body;
+        params.transactionCategory = HelperService.getMongoObjectId(transactionCategory._id);
+        params.transactionSubCategory = params.investmentDetail.investmentType._id;
+        params.user = req.current_user._id;
+        params.account = (params.account) ? params.account._id : null;
+        params.transactionType = creditTrnsaction._id;
+        let transaction = await FinanceWorkflow.createNewTransaction(params, req.current_user);
+        if (transaction) {
+            investmentTransaction = await FinanceService.closeInvestment(params, req.current_user); 
+        }
+        res.send({
+            status: true,
+            message: 'Money invested successfully, please check account balance',
+            investmentTransaction
+        });
     } catch (error) {
         let errorMsg = (typeof error === 'string') ? error : GlobalEnum.ERRORS[500];
         res.status(500).send({
