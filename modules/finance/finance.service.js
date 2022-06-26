@@ -281,7 +281,8 @@ async function getExpenseHistory(user_id) {
 async function getMonthlyExpenseSplit(user_id) {
     try {
         const dt = new Date();
-        const mnth = dt.getMonth() + 1;       
+        const mnth = dt.getMonth() + 1;
+        const yr = dt.getFullYear();
         let expenseConfig = await MasterDataDao.getDataByCode('EXPENSE');
         const expenseId = HelperService.getMongoObjectId(expenseConfig._id);
         const userId = HelperService.getMongoObjectId(user_id);
@@ -295,6 +296,9 @@ async function getMonthlyExpenseSplit(user_id) {
                     transMonth: {
                         $month: '$transactionDate'
                     },
+                    transYear: {
+                        $year: '$transactionDate'
+                    },
                     isReverted: 1
                 }
             }, { 
@@ -302,6 +306,7 @@ async function getMonthlyExpenseSplit(user_id) {
                     user: userId, 
                     transactionCategory: expenseId,
                     transMonth: mnth,
+                    transYear: yr,
                     isReverted: {
                         $exists: false
                     }
